@@ -1,0 +1,102 @@
+@import "variables";
+@import "~bootstrap/scss/bootstrap";
+@import "custom";
+
+body::before {
+    content: " ";
+    background-image: url('/img/triangles.png');
+    background-size: 500px 500px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: .2;
+    z-index: -1;
+}
+
+ul.timeline {
+    list-style-type: none;
+    position: relative;
+    
+    &:before {
+        content: " ";
+        background: #b7bec7;
+        display: inline-block;
+        position: absolute;
+        left: 29px;
+        width: 2px;
+        height: 100%;
+        z-index: 400;
+    }
+    
+    & > li {
+        margin: 20px 0;
+        padding-left: 20px;
+        display: flex;
+        justify-content: space-between;
+    }
+    
+    & > li:before {
+        content: ' ';
+        background: white;
+        display: inline-block;
+        position: absolute;
+        border-radius: 50%;
+        border: 3px solid #9a8bd3;
+        left: 20px;
+        width: 20px;
+        height: 20px;
+        z-index: 400;
+    }
+}
+
+.pt-6 {
+    padding-top: 5.5rem;
+}
+
+.pb-6 {
+    padding-bottom: 5.5rem;
+}
+
+.results {
+    margin: 0 30px 0 0;
+    display: flex;
+    flex-direction: column;
+
+    &__details {
+        color: $info;
+        text-transform: uppercase;
+        text-align: center;
+    }
+
+    &__date {
+        font-size: 0.8rem;
+        color: $green;
+    }
+}
+
+.leaderboard {  
+    @extend .table;
+    @extend .table-hover;
+    @extend .table-responsive-lg;
+
+    &--clickable {
+        & td {
+            cursor: pointer;
+        }
+    }
+}
+
+.route-transition-enter-active, .route-transition-leave-active {
+    transition: opacity .2s;
+}
+
+.route-transition-enter, .route-transition-leave-to {
+    opacity: 0;
+}
+
+[v-cloak] {
+    display: none !important;
+}
+

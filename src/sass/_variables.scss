@@ -1,0 +1,33 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap');
+
+$font-family-base: 'Poppins', sans-serif;
+
+$blue:    #5195dd !default;
+$indigo:  #6610f2 !default;
+$purple:  #6f42c1 !default;
+$pink:    #e83e8c !default;
+$red:     #E74C3C !default;
+$orange:  #fd7e14 !default;
+$yellow:  #F39C12 !default;
+$green:   #00bc8c !default;
+$teal:    #20c997 !default;
+$cyan:    #3498DB !default;
+
+$font-size-base: 0.95rem !default;
+
+$body-bg: hsl(255, 10%, 10%) !default;
+$body-color: #fff;
+
+$component-active-bg: rgba(36, 35, 43, 0.7);
+$border-color: #34383e;
+$hr-border-color: #5e6061;
+$h1-font-size:                3.5rem !default;
+
+$card-cap-bg: #722f4c;
+$card-bg: #302e38;
+$link-color: hsl(200, 40%, 75%) !default;
+
+$input-bg: #24232b;
+$input-border-color:  #24232b;
+$input-color: #fff;
+$input-group-addon-bg: #293033;
