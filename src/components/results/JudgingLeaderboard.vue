@@ -102,7 +102,7 @@
                                     @click="selectedScore = score"
                                 >
                                     <td>{{ i + 1 }}</td>
-                                    <country-flag-cell :country="score.country" />
+                                    <td>{{ score.user.username }}</td>
                                     <template v-if="displayMode === 'criterias'">
                                         <td v-for="criteria in criterias" :key="criteria.id">
                                             {{ getCriteriaScore(score, criteria.id) }}
@@ -174,7 +174,6 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import PageHeader from '../../components/PageHeader.vue';
-import CountryFlagCell from '../../components/CountryFlagCell.vue';
 import JudgingDetail from '../../components/results/JudgingDetail.vue';
 import TimeString from '../../components/TimeString.vue';
 import { UserScore, JudgeCorrel } from '../../../app/helpers';
@@ -187,7 +186,6 @@ import { Submission } from '../../../app/models/Submission';
     components: {
         PageHeader,
         JudgingDetail,
-        CountryFlagCell,
         TimeString,
     },
 })

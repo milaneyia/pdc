@@ -27,14 +27,6 @@ module.exports = {
                     configFile: path.join(__dirname, './tsconfig.src.json'),
                 },
             },
-            {
-                test: /\.s[ac]ss$/,
-                use: [
-                    'vue-style-loader',
-                    'css-loader',
-                    'sass-loader',
-                ],
-            },
         ],
     },
     resolve: {

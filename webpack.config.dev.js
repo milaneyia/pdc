@@ -10,8 +10,20 @@ module.exports = merge(base, {
         hot: true,
         stats: 'minimal',
         proxy: {
-            '/': 'http://localhost:3000',
+            '/': 'http://localhost:3001',
         },
+    },
+    module: {
+        rules: [
+            {
+                test: /\.s[ac]ss$/,
+                use: [
+                    'vue-style-loader',
+                    'css-loader',
+                    'sass-loader',
+                ],
+            },
+        ],
     },
     resolve: {
         alias: {

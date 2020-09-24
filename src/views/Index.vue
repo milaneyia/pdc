@@ -21,7 +21,7 @@
                             href="https://osu.ppy.sh/community/forums/topics/1145075"
                             target="__blank"
                         >
-                            <div class="country-flag" style="background-image: url('/img/osu.png'); height: 30px; width: 30px; background-repeat: no-repeat; background-size: cover;" />
+                            <div style="background-image: url('/img/osu.png'); height: 30px; width: 30px; background-repeat: no-repeat; background-size: cover;" />
                             <h5 class="mx-3 mb-0">
                                 {{ $t('index.links.forumPost') }}
                             </h5>
