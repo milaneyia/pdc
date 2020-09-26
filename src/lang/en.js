@@ -43,6 +43,10 @@ export default {
         note: 'Note that some preview links may not be available in your region, e.g. Netease Music is not available outside China Mainland. Please use the artist and title to search for preview links online.',
         fa: 'FA Songs',
         others: 'Rest of Songs',
+        results: {
+            title: 'Song Voting Results',
+            description: 'Sum of votes from the voting stage, 1 song will be used from the FA listing and 2 from the rest!',
+        },
     },
     submissions: {
         title: '.osz Submissions',

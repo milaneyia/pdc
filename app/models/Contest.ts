@@ -1,4 +1,4 @@
-import { BaseEntity, Column, CreateDateColumn, Entity, LessThanOrEqual, MoreThanOrEqual, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { BaseEntity, Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Song } from './Song';
 
 @Entity()
@@ -12,6 +12,17 @@ export class Contest extends BaseEntity {
             .leftJoinAndSelect('songs.votes', 'votes', 'votes.userId = :userId', { userId })
             .where('votingEndedAt >= :today', { today })
             .andWhere('votingStartedAt <= :today', { today })
+            .orderBy('songs.artist')
+            .getOne();
+    }
+
+    static findForVotingResults(): Promise<Contest | undefined> {
+        const today = new Date();
+
+        return this.createQueryBuilder('contest')
+            .leftJoinAndSelect('contest.songs', 'songs')
+            .leftJoinAndSelect('songs.votes', 'votes')
+            .where('votingEndedAt < :today', { today })
             .orderBy('songs.artist')
             .getOne();
     }

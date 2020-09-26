@@ -1,7 +1,7 @@
 import Router from '@koa/router';
-import { Next, ParameterizedContext } from 'koa';
 import { convertToIntOrThrow } from '../helpers';
 import { authenticate, simpleAuthenticate } from '../middlewares/authentication';
+import { downloadTemplate } from '../middlewares/downloadSubmission';
 import { Contest } from '../models/Contest';
 import { Song } from '../models/Song';
 import { User } from '../models/User';
@@ -11,27 +11,24 @@ const votingRouter = new Router();
 
 votingRouter.prefix('/api/voting');
 
-async function findContest (ctx: ParameterizedContext, next: Next) {
-    const contest = await Contest.findForVoting(ctx.state.user?.id);
-
+votingRouter.get('/', simpleAuthenticate, async (ctx) => {
+    const user: User | undefined = ctx.state.user;
+    let contest = await Contest.findForVoting(ctx.state.user?.id);
+    if (!contest || user?.isStaff) contest = await Contest.findForVotingResults();
     if (!contest) return ctx.body = { error: 'Voting is not in progress' };
 
-    ctx.state.contest = contest;
-    await next();
-}
-
-votingRouter.get('/', simpleAuthenticate, findContest, (ctx) => {
-    const user: User | undefined = ctx.state.user;
-    const songs = ctx.state.contest.songs;
-
     ctx.body = {
-        songs,
+        contest,
         user,
     };
 });
 
-votingRouter.post('/save', authenticate, findContest, async (ctx) => {
+votingRouter.post('/save', authenticate, async (ctx) => {
     const user: User = ctx.state.user;
+
+    const contest = await Contest.findForVoting(ctx.state.user?.id);
+    if (!contest) return ctx.body = { error: 'Voting is not in progress' };
+
     const points = convertToIntOrThrow(ctx.request.body.points);
     if (points < 1 || points > 3) throw new Error('Not valid points');
 
@@ -67,5 +64,11 @@ votingRouter.post('/save', authenticate, findContest, async (ctx) => {
         success: 'Saved',
     };
 });
+
+votingRouter.get('/:songId/downloadTemplate', async (ctx, next) => {
+    const id = convertToIntOrThrow(ctx.params.songId);
+    ctx.state.song = await Song.findOneOrFail({ id });
+    await next();
+}, downloadTemplate);
 
 export default votingRouter;
