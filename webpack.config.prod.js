@@ -4,7 +4,6 @@ const base = require('./webpack.config.base');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const PrerenderSPAPlugin = require('prerender-spa-plugin');
 const { merge } = require('webpack-merge');
 
 module.exports = merge(base, {
@@ -53,21 +52,6 @@ module.exports = merge(base, {
                     },
                 },
             ],
-        }),
-        new PrerenderSPAPlugin({
-            staticDir: path.join(__dirname, 'dist/public/'),
-            routes: [ '/', '/results' ],
-            postProcess (renderedRoute) {
-                renderedRoute.route = renderedRoute.originalRoute;
-                const s = renderedRoute.route.split('/');
-                renderedRoute.outputPath = path.join(__dirname, 'dist/public', `${s[s.length - 1] || 'index'}.html`);
-
-                return renderedRoute;
-            },
-            renderer: new PrerenderSPAPlugin.PuppeteerRenderer({
-                // Reminder to NOT do this with lots of files
-                renderAfterTime: 5000,
-            }),
         }),
     ],
     optimization: {
