@@ -64,7 +64,10 @@ export default Vue.extend({
         },
         async fileRequest<T>(url: string, data?: { oszFile: File | null; [key: string]: any }, e?: Event | null): Promise<T | undefined> {
             if (!data?.oszFile) {
-                alert('Select an .osz');
+                this.$store.commit('addToast', {
+                    message: 'Select an .osz',
+                    type: 'danger',
+                });
 
                 return;
             }
@@ -83,13 +86,24 @@ export default Vue.extend({
                     },
                 });
 
-                if (res.data.error || res.data.success) {
-                    alert(res.data.error || res.data.success);
+                if (res.data.error) {
+                    this.$store.commit('addToast', {
+                        message: res.data.error,
+                        type: 'danger',
+                    });
+                } else if (res.data.success) {
+                    this.$store.commit('addToast', {
+                        message: res.data.success,
+                        type: 'success',
+                    });
                 }
 
                 return res.data;
             } catch (error) {
-                alert('Something went wrong');
+                this.$store.commit('addToast', {
+                    message: 'Something went wrong!',
+                    type: 'danger',
+                });
             } finally {
                 if (e?.target) (e.target as HTMLInputElement).disabled = false;
             }
