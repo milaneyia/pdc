@@ -17,6 +17,9 @@ submissionsAdminRouter.use(isStaff);
 
 submissionsAdminRouter.get('/', async (ctx) => {
     const songs = await Song.find({
+        where: {
+            wasChosen: true,
+        },
         relations: [
             'submissions',
             'submissions.user',

@@ -79,22 +79,8 @@ contestsAdminRouter.post('/storeSong', async (ctx) => {
     };
 });
 
-contestsAdminRouter.post('/songs/:id/update', koaBody({
-    multipart: true,
-    formidable: {
-        multiples: false,
-    },
-}), async (ctx) => {
-    const oszFile = ctx.request.files?.oszFile;
-
-    if (!oszFile || !oszFile.name.endsWith('.osz')) {
-        return ctx.body = {
-            error: 'Select an .osz file',
-        };
-    }
-
-    const data: Song = ctx.request.body.song;
-    const song = await Song.findOneOrFail({ id: ctx.params.id });
+async function updateSong (data: Song, id: number): Promise<Song> {
+    const song = await Song.findOneOrFail({ id });
     song.artist = data.artist;
     song.title = data.title;
     song.previewLink = data.previewLink;
@@ -102,8 +88,37 @@ contestsAdminRouter.post('/songs/:id/update', koaBody({
     song.wasChosen = data.wasChosen;
     await song.save();
 
-    const paths = generateTemplatePaths(song);
-    await saveFile(oszFile.path, paths.finalDir, paths.finalPath);
+    return song;
+}
+
+contestsAdminRouter.post('/songs/:id/uploadOsz', koaBody({
+    multipart: true,
+    formidable: {
+        multiples: false,
+    },
+}), async (ctx) => {
+    const oszFile = ctx.request.files?.oszFile;
+
+    if (oszFile && !oszFile.name.endsWith('.osz')) {
+        return ctx.body = {
+            error: 'Select an .osz file',
+        };
+    }
+
+    const song = await updateSong(ctx.request.body.song, ctx.params.id);
+
+    if (oszFile) {
+        const paths = generateTemplatePaths(song);
+        await saveFile(oszFile.path, paths.finalDir, paths.finalPath);
+    }
+
+    ctx.body = {
+        success: 'ok',
+    };
+});
+
+contestsAdminRouter.post('/songs/:id/update', async (ctx) => {
+    await updateSong(ctx.request.body.song, ctx.params.id);
 
     ctx.body = {
         success: 'ok',
@@ -119,8 +134,9 @@ contestsAdminRouter.post('/songs/:id/remove', async (ctx) => {
     };
 });
 
-contestsAdminRouter.post('/songs/:id/download', async (ctx) => {
+contestsAdminRouter.get('/songs/:id/download', async (ctx, next) => {
     ctx.state.song = await Song.findOneOrFail({ id: ctx.params.id });
+    await next();
 }, downloadTemplate);
 
 export default contestsAdminRouter;

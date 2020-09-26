@@ -10,6 +10,9 @@ judgingAdminRouter.use(isStaff);
 
 judgingAdminRouter.get('/', async (ctx) => {
     const songs = await Song.find({
+        where: {
+            wasChosen: true,
+        },
         relations: [
             'submissions',
             'submissions.judging',

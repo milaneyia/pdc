@@ -113,7 +113,7 @@ export function generateOriginalZipPaths(song: Song): Paths {
 export function generateTemplatePaths(song: Song): Paths {
     const finalDir = path.join(__dirname, `../osz/originals/${song.id}`);
     const finalPath = path.join(finalDir, 'template.osz');
-    const outputFilename = `${song.title}-template.osz`;
+    const outputFilename = `${song.title} - template.osz`;
 
     return {
         finalDir,

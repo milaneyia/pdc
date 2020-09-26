@@ -236,10 +236,17 @@ export default class ManageContest extends Vue {
     }
 
     async updateSong (song: Song, e): Promise<void> {
-        await this.fileRequest<{ contest: Contest }>(`/api/admin/contests/songs/${song.id}/update`, {
-            oszFile: this.oszFiles[song.id],
-            song,
-        }, e);
+        if (this.oszFiles[song.id]) {
+            await this.fileRequest<{ success: string }>(`/api/admin/contests/songs/${song.id}/uploadOsz`, {
+                oszFile: this.oszFiles[song.id],
+                song,
+            }, e);
+        } else {
+            await this.postRequest<{ success: string }>(`/api/admin/contests/songs/${song.id}/update`, {
+                song,
+            }, e);
+        }
+
         await this.getContestData();
     }
 

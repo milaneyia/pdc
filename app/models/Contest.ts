@@ -10,12 +10,8 @@ export class Contest extends BaseEntity {
         return this.createQueryBuilder('contest')
             .leftJoinAndSelect('contest.songs', 'songs')
             .leftJoinAndSelect('songs.votes', 'votes', 'votes.userId = :userId', { userId })
-            // .where({
-            //     votingEndedAt: MoreThanOrEqual(today),
-            //     votingStartedAt: LessThanOrEqual(today),
-            // })
             .where('votingEndedAt >= :today', { today })
-            .where('votingStartedAt <= :today', { today })
+            .andWhere('votingStartedAt <= :today', { today })
             .orderBy('songs.artist')
             .getOne();
     }
@@ -25,10 +21,8 @@ export class Contest extends BaseEntity {
 
         return this.createQueryBuilder('contest')
             .leftJoinAndSelect('contest.songs', 'songs', 'songs.wasChosen = true')
-            .where({
-                submissionsEndedAt: MoreThanOrEqual(today),
-                submissionsStartedAt: LessThanOrEqual(today),
-            })
+            .where('submissionsEndedAt >= :today', { today })
+            .andWhere('submissionsStartedAt <= :today', { today })
             .getOne();
     }
 
@@ -37,10 +31,8 @@ export class Contest extends BaseEntity {
 
         return this.createQueryBuilder('contest')
             .leftJoinAndSelect('contest.songs', 'songs', 'songs.wasChosen = true')
-            .where({
-                judgingEndedAt: MoreThanOrEqual(today),
-                judgingStartedAt: LessThanOrEqual(today),
-            })
+            .where('judgingEndedAt >= :today', { today })
+            .andWhere('judgingStartedAt <= :today', { today })
             .getOne();
     }
 
@@ -49,9 +41,7 @@ export class Contest extends BaseEntity {
 
         return this.createQueryBuilder('contest')
             .leftJoinAndSelect('contest.songs', 'songs', 'songs.wasChosen = true')
-            .where({
-                judgingEndedAt: LessThanOrEqual(today),
-            })
+            .where('judgingEndedAt <= :today', { today })
             .orderBy({
                 judgingEndedAt: 'DESC',
             })
