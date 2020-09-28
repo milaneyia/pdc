@@ -33,7 +33,7 @@ votingRouter.post('/save', authenticate, async (ctx) => {
     if (points < 1 || points > 3) throw new Error('Not valid points');
 
     const songId = convertToIntOrThrow(ctx.request.body.songId);
-    const songs: Song[] = ctx.state.contest.songs;
+    const songs: Song[] = contest.songs;
     const inputSong = songs.find(s => s.id === songId);
 
     if (!inputSong) throw new Error('Song not found');
