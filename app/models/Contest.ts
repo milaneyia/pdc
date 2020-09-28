@@ -16,15 +16,16 @@ export class Contest extends BaseEntity {
             .getOne();
     }
 
-    static findForVotingResults(): Promise<Contest | undefined> {
+    static findForVotingResults(isStaff: boolean | undefined): Promise<Contest | undefined> {
         const today = new Date();
-
-        return this.createQueryBuilder('contest')
+        const query = this.createQueryBuilder('contest')
             .leftJoinAndSelect('contest.songs', 'songs')
             .leftJoinAndSelect('songs.votes', 'votes')
-            .where('votingEndedAt < :today', { today })
-            .orderBy('songs.artist')
-            .getOne();
+            .orderBy('songs.artist');
+
+        if (!isStaff) query.where('votingEndedAt < :today', { today });
+
+        return query.getOne();
     }
 
     static findForSubmissions(): Promise<Contest | undefined> {

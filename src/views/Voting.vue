@@ -17,7 +17,7 @@
             {{ $t('voting.note') }}
         </page-header>
 
-        <div v-if="isResultsTime" class="row mb-2">
+        <div v-if="isResultsTime || (user && user.isStaff)" class="row mb-2">
             <div class="col-lg-6 mb-2">
                 <song-results-listing
                     :list-title="$t('voting.fa')"
