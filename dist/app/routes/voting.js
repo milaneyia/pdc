@@ -26,7 +26,7 @@ votingRouter.get('/', authentication_1.simpleAuthenticate, (ctx) => __awaiter(vo
     const user = ctx.state.user;
     let contest = yield Contest_1.Contest.findForVoting((_a = ctx.state.user) === null || _a === void 0 ? void 0 : _a.id);
     if (!contest || (user === null || user === void 0 ? void 0 : user.isStaff))
-        contest = yield Contest_1.Contest.findForVotingResults();
+        contest = yield Contest_1.Contest.findForVotingResults(user === null || user === void 0 ? void 0 : user.isStaff);
     if (!contest)
         return ctx.body = { error: 'Voting is not in progress' };
     ctx.body = {

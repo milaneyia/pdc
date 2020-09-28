@@ -23,14 +23,15 @@ let Contest = class Contest extends typeorm_1.BaseEntity {
             .orderBy('songs.artist')
             .getOne();
     }
-    static findForVotingResults() {
+    static findForVotingResults(isStaff) {
         const today = new Date();
-        return this.createQueryBuilder('contest')
+        const query = this.createQueryBuilder('contest')
             .leftJoinAndSelect('contest.songs', 'songs')
             .leftJoinAndSelect('songs.votes', 'votes')
-            .where('votingEndedAt < :today', { today })
-            .orderBy('songs.artist')
-            .getOne();
+            .orderBy('songs.artist');
+        if (!isStaff)
+            query.where('votingEndedAt < :today', { today });
+        return query.getOne();
     }
     static findForSubmissions() {
         const today = new Date();
