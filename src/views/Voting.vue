@@ -17,7 +17,7 @@
             {{ $t('voting.note') }}
         </page-header>
 
-        <div v-if="isResultsTime || (user && user.isStaff)" class="row mb-2">
+        <div v-if="isResultsTime" class="row mb-2">
             <div class="col-lg-6 mb-2">
                 <song-results-listing
                     :list-title="$t('voting.fa')"
@@ -127,7 +127,7 @@ export default class Voting extends Vue {
     }
 
     get isResultsTime (): boolean | null {
-        return this.contest && new Date(this.contest.votingEndedAt) <= new Date();
+        return this.contest && (new Date(this.contest.votingEndedAt) <= new Date() || (this.user && this.user.isStaff));
     }
 
     get songs (): Song[] {
