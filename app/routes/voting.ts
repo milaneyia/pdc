@@ -14,7 +14,7 @@ votingRouter.prefix('/api/voting');
 votingRouter.get('/', simpleAuthenticate, async (ctx) => {
     const user: User | undefined = ctx.state.user;
     let contest = await Contest.findForVoting(ctx.state.user?.id);
-    if (!contest || user?.isStaff) contest = await Contest.findForVotingResults();
+    if (!contest || user?.isStaff) contest = await Contest.findForVotingResults(user?.isStaff);
     if (!contest) return ctx.body = { error: 'Voting is not in progress' };
 
     ctx.body = {
