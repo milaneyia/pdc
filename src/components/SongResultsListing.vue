@@ -10,12 +10,12 @@
                 class="row mt-2"
                 :class="song.wasChosen ? 'text-success' : ''"
             >
-                <div class="col-sm-1 text-center">
+                <div class="col-sm-2 text-center">
                     <span :class="song.wasChosen ? 'text-success' : 'text-info'">
                         <b>{{ song.totalPoints }}</b>
                     </span>
                 </div>
-                <div class="col-sm-11 text-center text-sm-left d-flex">
+                <div class="col-sm-10 text-center text-sm-left d-flex">
                     {{ song.artist }} - {{ song.title }}
                     <a
                         v-if="song.wasChosen"
