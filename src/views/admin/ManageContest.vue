@@ -28,7 +28,7 @@
                                 class="form-control"
                                 :name="key"
                                 :value="formatDate(contest[key])"
-                                @change="parseDate(key, $event.target.value)"
+                                @change="setDate(key, $event.target.value)"
                             >
                         </div>
                     </div>
@@ -191,6 +191,7 @@ export default class ManageContest extends Vue {
     newSong = {};
     inputs = ['artist', 'title', 'previewLink'];
     oszFiles = [];
+    schedule = {};
 
     async created (): Promise<void> {
         const data = await this.initialRequest<{ contest: Contest }>('/api/admin/contests');
@@ -206,15 +207,15 @@ export default class ManageContest extends Vue {
         return this.$dayjs(date).format('YYYY-MM-DDTHH:mm');
     }
 
-    parseDate (key: string, value: string): void {
+    setDate (key: string, value: string): void {
         if (!this.contest) return;
 
-        this.contest[key] = this.$dayjs(value);
+        this.schedule[key] = this.$dayjs(value);
     }
 
     async update (e): Promise<void> {
         await this.postRequest<{ contest: Contest }>('/api/admin/contests/update', {
-            contest: this.contest,
+            contest: this.schedule,
         }, e);
         await this.getContestData();
     }
