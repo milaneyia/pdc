@@ -32,7 +32,7 @@ export async function authenticate(ctx: ParameterizedContext, next: Next): Promi
                 return ctx.body = { error: 'Re-login..' };
             }
 
-            ctx.session.expireIn = Date.now() + (response.expires_in * 1000);
+            ctx.session.expiresIn = Date.now() + (response.expires_in * 1000);
             ctx.session.accessToken = response.access_token;
             ctx.session.refreshToken = response.refresh_token;
         }

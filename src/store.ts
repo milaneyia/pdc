@@ -10,7 +10,7 @@ export interface MainState {
     criterias: Criteria[];
     judges: User[];
     contest: Contest | null;
-    teamsScores: UserScore[];
+    usersScores: UserScore[];
     judgesCorrel: JudgeCorrel[];
 }
 
@@ -30,7 +30,7 @@ const store: StoreOptions<MainState> = {
         // Contest
         criterias: [],
         judges: [],
-        teamsScores: [],
+        usersScores: [],
         judgesCorrel: [],
     },
     mutations: {
@@ -54,11 +54,11 @@ const store: StoreOptions<MainState> = {
             state.criterias = payload.criterias || [];
             state.judges = payload.judges || [];
             state.contest = payload.contest;
-            state.teamsScores = payload.teamsScores;
+            state.usersScores = payload.usersScores;
             state.judgesCorrel = payload.judgesCorrel;
         },
         sortByCriteria (state, payload): void {
-            state.teamsScores.sort((a, b) => {
+            state.usersScores.sort((a, b) => {
                 const criteriaA = a.criteriaSum.find(c => c.criteriaId === payload.criteriaId);
                 const criteriaB = b.criteriaSum.find(c => c.criteriaId === payload.criteriaId);
                 let sumA = 0;
@@ -75,7 +75,7 @@ const store: StoreOptions<MainState> = {
             });
         },
         sortByJudge (state, payload): void {
-            state.teamsScores.sort((a, b) => {
+            state.usersScores.sort((a, b) => {
                 const judgeA = a.judgingSum.find(c => c.judgeId === payload.judgeId);
                 const judgeB = b.judgingSum.find(c => c.judgeId === payload.judgeId);
                 let sumA = 0;
@@ -92,7 +92,7 @@ const store: StoreOptions<MainState> = {
             });
         },
         sortByRawScore (state, payload): void {
-            state.teamsScores.sort((a, b) => {
+            state.usersScores.sort((a, b) => {
                 if (payload.sortDesc) {
                     return b.rawFinalScore - a.rawFinalScore;
                 }
@@ -101,7 +101,7 @@ const store: StoreOptions<MainState> = {
             });
         },
         sortByStdScore (state, payload): void {
-            state.teamsScores.sort((a, b) => {
+            state.usersScores.sort((a, b) => {
                 if (payload.sortDesc) {
                     return b.standardizedFinalScore - a.standardizedFinalScore;
                 }

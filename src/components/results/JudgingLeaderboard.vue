@@ -95,7 +95,7 @@
                             </thead>
                             <tbody>
                                 <tr
-                                    v-for="(score, i) in teamsScores"
+                                    v-for="(score, i) in usersScores"
                                     :key="i"
                                     data-toggle="modal"
                                     data-target="#detailModal"
@@ -194,7 +194,7 @@ export default class JudgingLeaderboard extends Vue {
     @State criterias!: [];
     @State judges!: User[];
     @State contest!: Contest | null;
-    @State teamsScores!: UserScore[];
+    @State usersScores!: UserScore[];
     @State judgesCorrel!: JudgeCorrel[];
     @Getter submissionsLength!: number | undefined;
 
