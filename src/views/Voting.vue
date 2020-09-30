@@ -1,53 +1,18 @@
 <template>
     <div class="container">
-        <page-header
+        <voting-results
             v-if="isResultsTime"
-            :title="$t('voting.results.title')"
-            class="text-center"
-        >
-            {{ $t('voting.results.description') }}
-        </page-header>
+            :fa-songs="faSongs"
+            :other-songs="otherSongs"
+        />
 
-        <page-header
-            v-else
-            :title="$t('voting.title')"
-            class="text-center"
-        >
-            <p>{{ $t('voting.description') }}</p>
-            {{ $t('voting.note') }}
-        </page-header>
-
-        <div v-if="isResultsTime" class="row mb-2">
-            <div class="col-lg-6 mb-2">
-                <song-results-listing
-                    :list-title="$t('voting.fa')"
-                    :songs="faSongs"
-                />
-            </div>
-            <div class="col-lg-6">
-                <song-results-listing
-                    :list-title="$t('voting.others')"
-                    :songs="otherSongs"
-                />
-            </div>
-        </div>
-
-        <div v-else-if="contest" class="row mb-2">
-            <div class="col-lg-6 mb-2">
-                <song-listing
-                    :list-title="$t('voting.fa')"
-                    :songs="faSongs"
-                    @save="save($event.points, $event.songId, $event.e)"
-                />
-            </div>
-            <div class="col-lg-6">
-                <song-listing
-                    :list-title="$t('voting.others')"
-                    :songs="otherSongs"
-                    @save="save($event.points, $event.songId, $event.e)"
-                />
-            </div>
-        </div>
+        <voting-phase
+            v-else-if="contest"
+            :user="user"
+            :fa-songs="faSongs"
+            :other-songs="otherSongs"
+            @get-data="getData()"
+        />
 
         <login-modal />
     </div>
@@ -56,11 +21,9 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import PageHeader from '../components/PageHeader.vue';
-import TimeString from '../components/TimeString.vue';
-import SongListing from '../components/SongListing.vue';
-import SongResultsListing from '../components/SongResultsListing.vue';
 import LoginModal from '../components/LoginModal.vue';
+import VotingPhase from '../components/voting/VotingPhase.vue';
+import VotingResults from '../components/voting/VotingResults.vue';
 import { Contest, Song, User } from '../interfaces';
 
 interface ApiResponse {
@@ -70,20 +33,15 @@ interface ApiResponse {
 
 @Component({
     components: {
-        PageHeader,
-        TimeString,
-        SongListing,
-        SongResultsListing,
         LoginModal,
+        VotingPhase,
+        VotingResults,
     },
 })
 export default class Voting extends Vue {
 
     user: User | null = null;
     contest: Contest | null = null;
-    oszFile: File | null = null;
-    isSaving = false;
-    selectedSong: Song | null = null
 
     async created (): Promise<void> {
         this.$store.commit('updateLoadingState');
@@ -102,20 +60,6 @@ export default class Voting extends Vue {
         }
     }
 
-    async save (points: number, songId: number, e: Event): Promise<void> {
-        if (!this.user) {
-            $('#loginModal').modal('show');
-
-            return;
-        }
-
-        await this.postRequest('/api/voting/save', {
-            points,
-            songId,
-        }, e);
-        await this.getData();
-    }
-
     get sortedSongs (): Song[] {
         if (!this.contest) return [];
 
@@ -123,7 +67,7 @@ export default class Voting extends Vue {
             song.totalPoints = song.votes.map(v => v.points).reduce((acc, points) => acc + points, 0);
         }
 
-        return this.contest.songs.sort((a, b) => b.totalPoints - a.totalPoints);
+        return [...this.contest.songs].sort((a, b) => b.totalPoints - a.totalPoints);
     }
 
     get isResultsTime (): boolean | null {
