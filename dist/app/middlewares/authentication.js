@@ -39,7 +39,7 @@ function authenticate(ctx, next) {
                     ctx.session = null;
                     return ctx.body = { error: 'Re-login..' };
                 }
-                ctx.session.expireIn = Date.now() + (response.expires_in * 1000);
+                ctx.session.expiresIn = Date.now() + (response.expires_in * 1000);
                 ctx.session.accessToken = response.access_token;
                 ctx.session.refreshToken = response.refresh_token;
             }
