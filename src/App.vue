@@ -27,6 +27,11 @@
                             {{ $t('nav.home') }}
                         </router-link>
                     </li>
+                    <li class="nav-item">
+                        <router-link class="nav-link small" to="/info">
+                            {{ $t('nav.info') }}
+                        </router-link>
+                    </li>
                     <li v-if="isResultsTime" class="nav-item">
                         <router-link class="nav-link small" to="/results">
                             {{ $t('nav.results') }}

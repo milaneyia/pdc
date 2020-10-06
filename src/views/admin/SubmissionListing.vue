@@ -14,7 +14,7 @@
                     :key="song.id"
                     :value="song.id"
                 >
-                    {{ song.artist }} - {{ song.title }} ({{ song.category.name }})
+                    {{ song.artist }} - {{ song.title }} ({{ song.category && song.category.name }})
                 </option>
             </select>
 

@@ -1,6 +1,6 @@
 import { RouteConfig } from 'vue-router';
 import Index from './views/Index.vue';
-// const Information = () => import(/* webpackChunkName: "info", webpackPrefetch: true */ './views/Information.vue');
+const Information = () => import(/* webpackChunkName: "info", webpackPrefetch: true */ './views/Information.vue');
 const Results = () => import(/* webpackChunkName: "info", webpackPrefetch: true */ './views/Results.vue');
 const Voting = () => import(/* webpackChunkName: "user" */ './views/Voting.vue');
 const Submissions = () => import(/* webpackChunkName: "user" */ './views/Submissions.vue');
@@ -13,7 +13,7 @@ const JudgingPanel = () => import(/* webpackChunkName: "judging" */ './views/Jud
 
 const routes: RouteConfig[] = [
     { path: '/', component: Index },
-    // { path: '/info', component: Information, meta: { title: 'Information - PDC2020' } },
+    { path: '/info', component: Information, meta: { title: 'Information - PDC2020' } },
     { path: '/results', component: Results, meta: { title: 'Results - PDC2020' } },
 
     { path: '/voting', component: Voting, meta: { title: 'Song Voting - PDC2020' } },

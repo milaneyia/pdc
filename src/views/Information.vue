@@ -1,50 +1,90 @@
 <template>
     <div class="container">
         <page-header
-            title="Information"
+            :title="$t('nav.info')"
         />
 
         <card-text>
             <div class="text-center">
-                Hello! It is the time to celebrate again the great annual mapping contest – Pending Cup!
+                {{ $t('information.intro.hello') }}
             </div>
+
             <hr>
-            <p>Pending Cup is originally a Chinese mapping contest, which had its first iteration in 2013 and held by NatsumeRin. Through the past years, Pending Cup has always been a means of encouraging creative mapping and finding new talent across the entire mapping community, and it will always be the core value of the contest. We would strongly encourage and welcome you to participate this event!</p>
+            <p>{{ $t('information.intro.history') }}</p>
             <hr>
-            <span class="text-right text-secondary">Contest rules will be announced when the contest starts.</span>
+
+            <div class="text-center">
+                {{ $t('information.intro.moreInfo.go') }}
+                <a
+                    href="https://osu.ppy.sh/community/forums/topics/1155108"
+                    target="__blank"
+                >
+                    <b>{{ $t('information.intro.moreInfo.here') }}</b>
+                </a>
+            </div>
         </card-text>
 
         <card-text
-            header="Criterias"
+            :header="$t('information.ruleset.title')"
+        >
+            <p>
+                <b>{{ $t('information.ruleset.note') }}</b>
+            </p>
+
+            <ul>
+                <li v-for="(rule, i) in $t('information.ruleset.rules')" :key="i">
+                    {{ rule }}
+                </li>
+            </ul>
+        </card-text>
+
+        <card-text
+            :header="$t('information.songs.title')"
+        >
+            <p>
+                {{ $t('information.songs.description') }}
+            </p>
+
+            <p v-for="category in categories" :key="category.id">
+                <b>{{ category.name }}</b>
+
+                <ul>
+                    <li v-for="song in category.songs" :key="song.id">
+                        {{ song.artist }} - {{ song.title }}
+                        <a
+                            v-if="song.wasChosen"
+                            class="ml-auto"
+                            :href="`/api/voting/${song.id}/downloadTemplate`"
+                        >
+                            <i class="fas fa-download" />
+                        </a>
+                    </li>
+                </ul>
+            </p>
+        </card-text>
+
+        <card-text
+            :header="$t('information.mapping.title')"
         >
             <ul>
-                <li class="mb-3">
-                    30% - Expertise
-                    <div>
-                        How well does the submission demonstrate techniques regarding structure,
-                        music representation, flow, hitsounding, etc?
-                    </div>
+                <li v-for="(rule, i) in $t('information.mapping.rules')" :key="i">
+                    {{ rule }}
                 </li>
-                <li class="mb-3">
-                    30% - Cohesion
+            </ul>
+        </card-text>
+
+        <card-text
+            :header="$t('information.criterias.title')"
+        >
+            <ul>
+                <li
+                    v-for="(criteria, i) in $t('information.criterias.criterias')"
+                    :key="i"
+                    class="mb-3"
+                >
+                    {{ criteria.percentage }} - {{ criteria.name }}
                     <div>
-                        How consistent is the submission regarding structure, music representation,
-                        flow, hitsounding etc especially between different sections, considering this
-                        contest is collaborative?
-                    </div>
-                </li>
-                <li class="mb-3">
-                    30% - Creativity
-                    <div>
-                        How well does the submission show originality and uniqueness compared with
-                        the other submissions with reasonable respect to the playability?
-                    </div>
-                </li>
-                <li class="mb-3">
-                    10% - Judge's Impression
-                    <div>
-                        This is the part of the score left to the Judges’ personal preferences on the
-                        submission
+                        {{ criteria.description }}
                     </div>
                 </li>
             </ul>
@@ -57,6 +97,7 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import PageHeader from '../components/PageHeader.vue';
 import CardText from '../components/CardText.vue';
+import { Getter } from 'vuex-class';
 
 @Component({
     components: {
@@ -65,6 +106,8 @@ import CardText from '../components/CardText.vue';
     },
 })
 export default class Information extends Vue {
+
+    @Getter categories;
 
 }
 </script>

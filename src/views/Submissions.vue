@@ -19,7 +19,7 @@
                                     v-for="submission in submissions"
                                     :key="submission.id"
                                 >
-                                    <td>{{ submission.song.artist }} - {{ submission.song.title }} ({{ submission.song.category.name }})</td>
+                                    <td>{{ submission.song.artist }} - {{ submission.song.title }} ({{ submission.song.category && submission.song.category.name }})</td>
                                     <td>
                                         {{ submission.updatedAt | shortDateTimeString }}
                                     </td>

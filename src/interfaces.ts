@@ -33,7 +33,16 @@ export interface Song {
     contest: Contest;
     submissions: Submission[];
     votes: Vote[];
+    categoryId: number;
+    category: Category;
+
     totalPoints: number;
+}
+
+export interface Category {
+    id: number;
+    name: string;
+    songs: Song[];
 }
 
 export interface Vote {

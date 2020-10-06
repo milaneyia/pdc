@@ -1,5 +1,5 @@
 import { StoreOptions } from 'vuex';
-import { User, Criteria, Contest } from './interfaces';
+import { User, Criteria, Contest, Category } from './interfaces';
 import { UserScore, JudgeCorrel } from '../app/helpers';
 
 export interface MainState {
@@ -122,6 +122,28 @@ const store: StoreOptions<MainState> = {
         },
         isResultsTime (state): boolean | null {
             return state.contest && new Date(state.contest.resultsAt) < new Date();
+        },
+        categories (state) {
+            if (!state.contest) return [];
+            const categories: Category[] = [];
+
+            for (const song of state.contest.songs) {
+                if (!song.category) continue;
+
+                let i = categories.findIndex(c => c.id === song.categoryId);
+
+                if (i === -1) {
+                    categories.push({
+                        ...song.category,
+                        songs: [],
+                    });
+                    i = categories.length - 1;
+                }
+
+                categories[i].songs.push(song);
+            }
+
+            return categories;
         },
     },
 };
