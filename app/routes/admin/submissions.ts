@@ -21,6 +21,7 @@ submissionsAdminRouter.get('/', async (ctx) => {
             wasChosen: true,
         },
         relations: [
+            'category',
             'submissions',
             'submissions.user',
         ],
@@ -60,6 +61,7 @@ submissionsAdminRouter.post('/:id/save', koaBody({
         },
         relations: [
             'song',
+            'user',
         ],
     });
 

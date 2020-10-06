@@ -19,7 +19,7 @@
                                     v-for="submission in submissions"
                                     :key="submission.id"
                                 >
-                                    <td>{{ submission.song.artist }} - {{ submission.song.title }}</td>
+                                    <td>{{ submission.song.artist }} - {{ submission.song.title }} ({{ submission.song.category.name }})</td>
                                     <td>
                                         {{ submission.updatedAt | shortDateTimeString }}
                                     </td>
@@ -50,13 +50,22 @@
                             {{ $t('submissions.deadline.submit') }}
                         </div>
                         <div class="card-body">
+                            <div class="text-center mb-2">
+                                <a
+                                    v-if="selectedSongId"
+                                    :href="`/api/voting/${selectedSongId}/downloadTemplate`"
+                                >
+                                    Download the template
+                                </a>
+                            </div>
+
                             <select v-model="selectedSongId" class="form-control mb-2">
                                 <option
                                     v-for="song in contest.songs"
                                     :key="song.id"
                                     :value="song.id"
                                 >
-                                    {{ song.artist }} - {{ song.title }}
+                                    {{ song.artist }} - {{ song.title }} ({{ song.category && song.category.name }})
                                 </option>
                             </select>
 

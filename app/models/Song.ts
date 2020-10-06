@@ -1,4 +1,5 @@
 import { BaseEntity, Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Category } from './Category';
 import { Contest } from './Contest';
 import { Submission } from './Submission';
 import { Vote } from './Vote';
@@ -29,6 +30,12 @@ export class Song extends BaseEntity {
 
     @ManyToOne(() => Contest, (contest) => contest.songs, { nullable: false })
     contest!: Contest;
+
+    @Column({ nullable: true })
+    categoryId!: number;
+
+    @ManyToOne(() => Category, (category) => category.songs)
+    category!: Category;
 
     @OneToMany(() => Submission, (submission) => submission.song)
     submissions!: Submission[];

@@ -17,10 +17,7 @@ submissionsRouter.get('/', async (ctx: ParameterizedContext) => {
     const user = await User.findByOsuId(ctx.session.osuId);
 
     const [submissions, contest] = await Promise.all([
-        Submission.find({
-            where: { user },
-            relations: ['song'],
-        }),
+        Submission.findUserSubmissions(user?.id),
         Contest.findForSubmissions(),
     ]);
 
@@ -56,13 +53,21 @@ submissionsRouter.post('/save', authenticate, koaBody({
         };
     }
 
+    const submissions = await Submission.findUserSubmissions(user.id);
+    let submission = submissions.find(s => s.songId === song.id);
+
+    if (!submission) {
+        const sameCategory = submissions.filter(s => s.song.categoryId === song.categoryId);
+
+        if (sameCategory.length) {
+            return ctx.body = {
+                error: 'You can only submit 1 song per category',
+            };
+        }
+    }
+
     const paths = generateOriginalPaths(song, user);
     await saveFile(oszFile.path, paths.finalDir, paths.finalPath);
-
-    let submission = await Submission.findOne({
-        user,
-        song,
-    });
 
     if (!submission) {
         submission = new Submission();

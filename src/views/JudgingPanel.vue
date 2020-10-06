@@ -124,7 +124,7 @@
                 data-keyboard="false"
             >
                 <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
-                    <div class="modal-content">
+                    <div class="modal-content bg-dark">
                         <div
                             v-if="alertInfo"
                             class="alert"
@@ -380,7 +380,7 @@ export default class JudgingPanel extends Vue {
             return;
 
         const { judgingDone } = res.data;
-        this.$emit('update:judging-done', judgingDone);
+        this.judgingDone = judgingDone;
     }
 
     closeModal(): void {

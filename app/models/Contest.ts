@@ -33,6 +33,7 @@ export class Contest extends BaseEntity {
 
         return this.createQueryBuilder('contest')
             .leftJoinAndSelect('contest.songs', 'songs', 'songs.wasChosen = true')
+            .leftJoinAndSelect('songs.category', 'category')
             .where('submissionsEndedAt >= :today', { today })
             .andWhere('submissionsStartedAt <= :today', { today })
             .getOne();
@@ -43,6 +44,7 @@ export class Contest extends BaseEntity {
 
         return this.createQueryBuilder('contest')
             .leftJoinAndSelect('contest.songs', 'songs', 'songs.wasChosen = true')
+            .leftJoinAndSelect('songs.category', 'category')
             .where('judgingEndedAt >= :today', { today })
             .andWhere('judgingStartedAt <= :today', { today })
             .getOne();
@@ -53,6 +55,7 @@ export class Contest extends BaseEntity {
 
         return this.createQueryBuilder('contest')
             .leftJoinAndSelect('contest.songs', 'songs', 'songs.wasChosen = true')
+            .leftJoinAndSelect('songs.category', 'category')
             .where('judgingEndedAt <= :today', { today })
             .orderBy({
                 judgingEndedAt: 'DESC',
@@ -65,6 +68,7 @@ export class Contest extends BaseEntity {
             return this
                 .createQueryBuilder('contest')
                 .leftJoinAndSelect('contest.songs', 'songs', 'songs.wasChosen = true')
+                .leftJoinAndSelect('songs.category', 'category')
                 .leftJoinAndSelect('songs.submissions', 'submissions', 'contest.resultsAt <= :today', { today: new Date() })
                 .leftJoinAndSelect('submissions.judging', 'judging')
                 .leftJoinAndSelect('judging.judge', 'judge')
@@ -76,6 +80,7 @@ export class Contest extends BaseEntity {
         return this.findOne({
             relations: [
                 'songs',
+                'songs.category',
                 'songs.submissions',
                 'songs.submissions.judging',
                 'songs.submissions.judging.judge',

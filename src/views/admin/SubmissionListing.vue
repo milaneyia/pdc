@@ -14,7 +14,7 @@
                     :key="song.id"
                     :value="song.id"
                 >
-                    {{ song.artist }} - {{ song.title }}
+                    {{ song.artist }} - {{ song.title }} ({{ song.category.name }})
                 </option>
             </select>
 
@@ -23,7 +23,7 @@
             </button>
 
             <a
-                :href="`/api/admin/songs/${selectedSongId}/downloadZip`"
+                :href="`/api/admin/submissions/${selectedSongId}/downloadZip`"
                 class="btn btn-sm btn-primary mt-2 mx-1"
                 target="_blank"
             >
@@ -35,7 +35,7 @@
             </button>
 
             <a
-                :href="`/api/admin/songs/${selectedSongId}/downloadAnomZip`"
+                :href="`/api/admin/submissions/${selectedSongId}/downloadAnomZip`"
                 class="btn btn-sm btn-primary mt-2 mx-1"
                 target="_blank"
             >
@@ -62,10 +62,7 @@
                     <td>{{ submission.user.username }}</td>
                     <td>{{ submission.updatedAt | shortDateTimeString }}</td>
                     <td>
-                        <a
-                            v-if="submission.originalPath"
-                            :href="`/api/admin/submissions/${submission.id}/download`"
-                        >
+                        <a :href="`/api/admin/submissions/${submission.id}/download`">
                             download
                         </a>
                     </td>
@@ -202,13 +199,13 @@ export default class SubmissionListing extends Vue {
     }
 
     async generateZip (e: Event): Promise<void> {
-        await this.postRequest(`/api/admin/songs/${this.selectedSongId}/generateZip`, {
+        await this.postRequest(`/api/admin/submissions/${this.selectedSongId}/generateZip`, {
             type: 'original',
         }, e);
     }
 
     async generateAnomZip (e: Event): Promise<void> {
-        await this.postRequest(`/api/admin/songs/${this.selectedSongId}/generateZip`, {
+        await this.postRequest(`/api/admin/submissions/${this.selectedSongId}/generateZip`, {
             type: 'anom',
         }, e);
     }

@@ -36,8 +36,9 @@ judgingRouter.get('/', async (ctx) => {
 
     if (contest) {
         contest = await Contest.createQueryBuilder('contest')
-            .leftJoin('contest.songs', 'songs')
+            .leftJoin('contest.songs', 'songs', 'songs.wasChosen = true')
             .leftJoin('songs.submissions', 'submissions')
+            .leftJoin('songs.category', 'category')
             .select([
                 'contest.id',
                 'contest.judgingStartedAt',
@@ -47,6 +48,8 @@ judgingRouter.get('/', async (ctx) => {
                 'songs.title',
                 'submissions.id',
                 'submissions.anonymisedAs',
+                'category.id',
+                'category.name',
             ])
             .where('contest.id = :contestId', { contestId: contest.id })
             .orderBy('submissions.anonymisedAs')
@@ -152,14 +155,6 @@ judgingRouter.get('/downloadZip/:songId', async (ctx, next) => {
     return await next();
 }, downloadAnonymousZip);
 
-judgingRouter.get('/submission/:id/download', findSubmission, async (ctx, next) => {
-    if (ctx.state.contest.id !== ctx.state.submission.match.roundId) {
-        return ctx.body = {
-            error: 'oops',
-        };
-    }
-
-    return await next();
-}, downloadAnonymous);
+judgingRouter.get('/submission/:id/download', findSubmission, downloadAnonymous);
 
 export default judgingRouter;
