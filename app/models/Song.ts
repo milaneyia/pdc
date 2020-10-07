@@ -25,6 +25,7 @@ export class Song extends BaseEntity {
     @Column({ default: false })
     wasChosen!: boolean;
 
+    // This field is now rebundant but there werent categories before so fuck it
     @Column()
     contestId!: number;
 

@@ -1,6 +1,8 @@
 import fs from 'fs';
 import path from 'path';
+import { Category } from './models/Category';
 import { Song } from './models/Song';
+import { Submission } from './models/Submission';
 import { User } from './models/User';
 
 export function convertToIntOrThrow(input: string): number {
@@ -57,10 +59,10 @@ export interface Paths {
     outputFilename: string;
 }
 
-function generateZipPaths(baseDir: string, song: Song): Paths {
-    const finalDir = path.join(baseDir, song.id.toString());
-    const finalPath = path.join(finalDir, `${song.id}.zip`);
-    const outputFilename = `${song.title}.zip`;
+function generateZipPaths(baseDir: string, category: Category): Paths {
+    const finalDir = path.join(baseDir, category.id.toString());
+    const finalPath = path.join(finalDir, `${category.id}.zip`);
+    const outputFilename = `${category.name}.zip`;
 
     return {
         finalDir,
@@ -98,16 +100,16 @@ export function generateOriginalPaths(song: Song, user: User): Paths {
     return generatePaths(baseDir, song, user);
 }
 
-export function generateAnonymizedZipPaths(song: Song): Paths {
-    const baseDir = path.join(__dirname, '../osz/anom/');
+export function generateAnonymizedZipPaths(category: Category): Paths {
+    const baseDir = path.join(__dirname, '../osz/zips/anom/');
 
-    return generateZipPaths(baseDir, song);
+    return generateZipPaths(baseDir, category);
 }
 
-export function generateOriginalZipPaths(song: Song): Paths {
-    const baseDir = path.join(__dirname, '../osz/originals/');
+export function generateOriginalZipPaths(category: Category): Paths {
+    const baseDir = path.join(__dirname, '../osz/zips/originals/');
 
-    return generateZipPaths(baseDir, song);
+    return generateZipPaths(baseDir, category);
 }
 
 export function generateTemplatePaths(song: Song): Paths {
@@ -145,19 +147,24 @@ export interface JudgeCorrel {
     correl: number;
 }
 
-export function calculateScores(song?: Song): { usersScores: UserScore[]; judgesCorrel: JudgeCorrel[] } {
+export interface Results {
+    id: number;
+    usersScores: UserScore[];
+    judgesCorrel: JudgeCorrel[];
+}
+
+export function calculateScores(submissions: Submission[]): { usersScores: UserScore[]; judgesCorrel: JudgeCorrel[] } {
     const usersScores: UserScore[] = [];
     const judgesCorrel: JudgeCorrel[] = [];
 
-    if (!song || !song.submissions.length) {
+    if (!submissions.length) {
         return {
             usersScores,
             judgesCorrel,
         };
     }
 
-    const judges = song.submissions?.[0]?.judging?.map(j => j.judge);
-    const submissions = song.submissions;
+    const judges = submissions?.[0]?.judging?.map(j => j.judge);
 
     for (const submission of submissions) {
         const userScore: UserScore = {

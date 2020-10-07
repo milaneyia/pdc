@@ -1,6 +1,6 @@
 <template>
     <div>
-        <template v-if="submissionsLength">
+        <template v-if="selectedCategoryResults">
             <div class="row my-3">
                 <div class="col-sm">
                     <a
@@ -30,7 +30,7 @@
                         |
                         <a
 
-                            :href="`/api/results/downloadZip/${contest.id}`"
+                            :href="`/api/results/downloadZip/${contest.id}/${selectedCategoryId}`"
                             target="_blank"
                         >
                             Download all entries
@@ -41,14 +41,11 @@
             <div class="row">
                 <div class="col-sm">
                     <div class="card card-body p-0">
-                        <table
-                            class="leaderboard"
-                            :class="submissionsLength ? 'leaderboard--clickable' : ''"
-                        >
+                        <table class="leaderboard leaderboard--clickable">
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>Team</th>
+                                    <th>User</th>
                                     <template v-if="displayMode === 'criterias'">
                                         <th
                                             v-for="criteria in criterias"
@@ -56,7 +53,7 @@
                                         >
                                             <a
                                                 href="#"
-                                                @click.prevent="sortByCriteria(criteria.id)"
+                                                @click.prevent="sortBy('criteria', criteria.id)"
                                             >
                                                 {{ criteria.name }}
                                             </a>
@@ -69,7 +66,7 @@
                                         >
                                             <a
                                                 href="#"
-                                                @click.prevent="sortByJudge(judge.id)"
+                                                @click.prevent="sortBy('judge', judge.id)"
                                             >
                                                 {{ judge.username }}
                                             </a>
@@ -78,7 +75,7 @@
                                     <th>
                                         <a
                                             href="#"
-                                            @click.prevent="sortByRawScore"
+                                            @click.prevent="sortBy('rawScore')"
                                         >
                                             Final Score (raw)
                                         </a>
@@ -86,7 +83,7 @@
                                     <th>
                                         <a
                                             href="#"
-                                            @click.prevent="sortByStdScore"
+                                            @click.prevent="sortBy('stdScore')"
                                         >
                                             Final Score (standardized)
                                         </a>
@@ -95,7 +92,7 @@
                             </thead>
                             <tbody>
                                 <tr
-                                    v-for="(score, i) in usersScores"
+                                    v-for="(score, i) in selectedCategoryResults.usersScores"
                                     :key="i"
                                     data-toggle="modal"
                                     data-target="#detailModal"
@@ -164,7 +161,7 @@
         </div>
 
         <judging-detail
-            v-if="submissionsLength && selectedScore"
+            v-if="selectedScore"
             :submission="scoreDetail"
         />
     </div>
@@ -173,14 +170,12 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import { Getter, State } from 'vuex-class';
 import PageHeader from '../../components/PageHeader.vue';
 import JudgingDetail from '../../components/results/JudgingDetail.vue';
 import TimeString from '../../components/TimeString.vue';
-import { UserScore, JudgeCorrel } from '../../../app/helpers';
-import { State, Getter } from 'vuex-class';
-import { Contest } from '../../../app/models/Contest';
-import { User } from '../../../app/models/User';
-import { Submission } from '../../../app/models/Submission';
+import { UserScore, Results } from '../../../app/helpers';
+import { Category, Contest, Submission, User } from '../../interfaces';
 
 @Component({
     components: {
@@ -194,20 +189,26 @@ export default class JudgingLeaderboard extends Vue {
     @State criterias!: [];
     @State judges!: User[];
     @State contest!: Contest | null;
-    @State usersScores!: UserScore[];
-    @State judgesCorrel!: JudgeCorrel[];
-    @Getter submissionsLength!: number | undefined;
+    @State selectedCategoryId!: number;
+    @Getter selectedCategory!: Category | undefined;
+    @Getter selectedCategoryResults!: Results;
 
     selectedScore: UserScore | null = null;
     displayMode: 'criterias' | 'judges' | 'detail' = 'criterias';
-    sortDesc = false;
 
     get scoreDetail (): Submission | undefined {
-        if (this.selectedScore) {
-            return this.contest?.songs?.[0]?.submissions?.find(s => s.user.id == this.selectedScore?.user.id);
+        let submission: Submission | undefined;
+        const songs = this.selectedCategory?.songs;
+
+        if (songs) {
+            for (const song of songs) {
+                const related = song.submissions?.find(s => s.user.id == this.selectedScore?.user.id);
+
+                if (related) submission = related;
+            }
         }
 
-        return undefined;
+        return submission;
     }
 
     getCriteriaScore (score: UserScore, criteriaId: number): number {
@@ -226,15 +227,15 @@ export default class JudgingLeaderboard extends Vue {
     }
 
     getJudgeAvg (id: number): number | string {
-        return this.judgesCorrel.find(j => j.id === id)?.rawAvg.toFixed(4) || 0;
+        return this.selectedCategoryResults.judgesCorrel.find(j => j.id === id)?.rawAvg.toFixed(4) || 0;
     }
 
     getJudgeSd (id: number): number | string {
-        return this.judgesCorrel.find(j => j.id === id)?.sd.toFixed(4) || 0;
+        return this.selectedCategoryResults.judgesCorrel.find(j => j.id === id)?.sd.toFixed(4) || 0;
     }
 
     getJudgeCorrel (id: number): number | string {
-        const correl = this.judgesCorrel.find(j => j.id === id)?.correl || 0;
+        const correl = this.selectedCategoryResults.judgesCorrel.find(j => j.id === id)?.correl || 0;
 
         return correl.toFixed(4);
     }
@@ -243,38 +244,10 @@ export default class JudgingLeaderboard extends Vue {
         return isNaN(standardizedFinalScore) ? '0' : standardizedFinalScore.toFixed(4);
     }
 
-    sortByCriteria (criteriaId: number): void {
-        this.sortDesc = !this.sortDesc;
-
-        this.$store.commit('sortByCriteria', {
-            criteriaId,
-            sortDesc: this.sortDesc,
-        });
-    }
-
-    sortByJudge (judgeId: number): void {
-        this.sortDesc = !this.sortDesc;
-
-        this.$store.commit('sortByJudge', {
-            judgeId,
-            sortDesc: this.sortDesc,
-        });
-    }
-
-    sortByRawScore (): void {
-        this.sortDesc = !this.sortDesc;
-
-        this.$store.commit('sortByRawScore', {
-            sortDesc: this.sortDesc,
-        });
-
-    }
-
-    sortByStdScore (): void {
-        this.sortDesc = !this.sortDesc;
-
-        this.$store.commit('sortByStdScore', {
-            sortDesc: this.sortDesc,
+    sortBy (field: string, relatedId?: number): void {
+        this.$store.commit('updateSort', {
+            sortBy: field,
+            sortById: relatedId,
         });
     }
 

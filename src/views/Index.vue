@@ -18,7 +18,7 @@
                         </a>
                         <a
                             class="d-flex align-items-center mb-3 mb-sm-0"
-                            href="https://osu.ppy.sh/community/forums/topics/1145075"
+                            href="https://osu.ppy.sh/community/forums/topics/1155108"
                             target="__blank"
                         >
                             <div style="background-image: url('/img/osu.png'); height: 30px; width: 30px; background-repeat: no-repeat; background-size: cover;" />

@@ -1,4 +1,5 @@
 import { BaseEntity, Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Category } from './Category';
 import { Song } from './Song';
 
 @Entity()
@@ -43,8 +44,8 @@ export class Contest extends BaseEntity {
         const today = new Date();
 
         return this.createQueryBuilder('contest')
-            .leftJoinAndSelect('contest.songs', 'songs', 'songs.wasChosen = true')
-            .leftJoinAndSelect('songs.category', 'category')
+            .leftJoinAndSelect('contest.categories', 'categories')
+            .leftJoinAndSelect('categories.songs', 'songs', 'songs.wasChosen = true')
             .where('judgingEndedAt >= :today', { today })
             .andWhere('judgingStartedAt <= :today', { today })
             .getOne();
@@ -54,8 +55,8 @@ export class Contest extends BaseEntity {
         const today = new Date();
 
         return this.createQueryBuilder('contest')
-            .leftJoinAndSelect('contest.songs', 'songs', 'songs.wasChosen = true')
-            .leftJoinAndSelect('songs.category', 'category')
+            .leftJoinAndSelect('contest.categories', 'categories')
+            .leftJoinAndSelect('categories.songs', 'songs', 'songs.wasChosen = true')
             .where('judgingEndedAt <= :today', { today })
             .orderBy({
                 judgingEndedAt: 'DESC',
@@ -67,9 +68,10 @@ export class Contest extends BaseEntity {
         if (restricted) {
             return this
                 .createQueryBuilder('contest')
-                .leftJoinAndSelect('contest.songs', 'songs', 'songs.wasChosen = true')
-                .leftJoinAndSelect('songs.category', 'category')
+                .leftJoinAndSelect('contest.categories', 'categories')
+                .leftJoinAndSelect('categories.songs', 'songs', 'songs.wasChosen = true')
                 .leftJoinAndSelect('songs.submissions', 'submissions', 'contest.resultsAt <= :today', { today: new Date() })
+                .leftJoinAndSelect('submissions.user', 'user')
                 .leftJoinAndSelect('submissions.judging', 'judging')
                 .leftJoinAndSelect('judging.judge', 'judge')
                 .leftJoinAndSelect('judging.judgingToCriterias', 'judgingToCriterias')
@@ -79,13 +81,14 @@ export class Contest extends BaseEntity {
 
         return this.findOne({
             relations: [
-                'songs',
-                'songs.category',
-                'songs.submissions',
-                'songs.submissions.judging',
-                'songs.submissions.judging.judge',
-                'songs.submissions.judging.judgingToCriterias',
-                'songs.submissions.judging.judgingToCriterias.criteria',
+                'categories',
+                'categories.songs',
+                'categories.songs.submissions',
+                'categories.songs.submissions.user',
+                'categories.songs.submissions.judging',
+                'categories.songs.submissions.judging.judge',
+                'categories.songs.submissions.judging.judgingToCriterias',
+                'categories.songs.submissions.judging.judgingToCriterias.criteria',
             ],
         });
     }
@@ -116,6 +119,9 @@ export class Contest extends BaseEntity {
 
     @OneToMany(() => Song, (song) => song.contest)
     songs!: Song[];
+
+    @OneToMany(() => Category, (category) => category.contest)
+    categories!: Category[];
 
     @CreateDateColumn()
     createdAt!: Date;

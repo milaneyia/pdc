@@ -45,7 +45,7 @@
                 {{ $t('information.songs.description') }}
             </p>
 
-            <p v-for="category in categories" :key="category.id">
+            <p v-for="category in contest.categories" :key="category.id">
                 <b>{{ category.name }}</b>
 
                 <ul>
@@ -97,7 +97,7 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import PageHeader from '../components/PageHeader.vue';
 import CardText from '../components/CardText.vue';
-import { Getter } from 'vuex-class';
+import { State } from 'vuex-class';
 
 @Component({
     components: {
@@ -107,7 +107,7 @@ import { Getter } from 'vuex-class';
 })
 export default class Information extends Vue {
 
-    @Getter categories;
+    @State contest;
 
 }
 </script>

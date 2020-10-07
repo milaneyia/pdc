@@ -20,6 +20,7 @@ export interface Contest {
     judgingEndedAt: Date;
     resultsAt: Date;
     songs: Song[];
+    categories: Category[];
 }
 
 export interface Song {
@@ -42,6 +43,8 @@ export interface Song {
 export interface Category {
     id: number;
     name: string;
+    contestId: number;
+    contest: Contest;
     songs: Song[];
 }
 

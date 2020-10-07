@@ -18,18 +18,18 @@
                     <div class="card">
                         <div class="card-header">
                             <div class="form-inline justify-content-center">
-                                <select v-model="selectedSong" class="form-control form-control-sm mr-2">
+                                <select v-model="selectedCategory" class="form-control form-control-sm mr-2">
                                     <option
-                                        v-for="song in contest.songs"
-                                        :key="song.id"
-                                        :value="song"
+                                        v-for="category in contest.categories"
+                                        :key="category.id"
+                                        :value="category"
                                     >
-                                        {{ song.artist }} - {{ song.title }}
+                                        {{ category.name }}
                                     </option>
                                 </select>
                                 <a
-                                    v-if="selectedSong"
-                                    :href="`/api/judging/downloadZip/${selectedSong.id}`"
+                                    v-if="selectedCategory"
+                                    :href="`/api/judging/downloadZip/${selectedCategory.id}`"
                                     target="_blank"
                                 >
                                     Download all entries
@@ -207,7 +207,7 @@ import Component from 'vue-class-component';
 import Axios from 'axios';
 import PageHeader from '../components/PageHeader.vue';
 import TimeString from '../components/TimeString.vue';
-import { Contest, Criteria, Judging, JudgingToCriteria, Song, Submission } from '../interfaces';
+import { Category, Contest, Criteria, Judging, JudgingToCriteria, Submission } from '../interfaces';
 
 interface ApiResponse {
     contest: Contest | null;
@@ -235,7 +235,7 @@ export default class JudgingPanel extends Vue {
     sortBy = 'name';
     sortByCriteria = 1;
     sortDesc = false;
-    selectedSong: Song | null = null;
+    selectedCategory: Category | null = null;
 
     async created (): Promise<void> {
         const data = await this.initialRequest<ApiResponse>('/api/judging');
@@ -244,13 +244,18 @@ export default class JudgingPanel extends Vue {
             this.contest = data.contest;
             this.criterias = data.criterias;
             this.judgingDone = data.judgingDone;
-            this.selectedSong = data.contest?.songs[0] || null;
+            this.selectedCategory = data.contest?.categories[0] || null;
         }
     }
 
     get sortedSubmissions (): Submission[] {
-        const submissions = this.selectedSong?.submissions;
-        if (!submissions) return [];
+        if (!this.selectedCategory) return [];
+
+        const submissions: Submission[] = [];
+
+        for (const song of this.selectedCategory.songs) {
+            submissions.push(...song.submissions);
+        }
 
         if (this.sortBy === 'name') {
             submissions.sort((a, b) => {

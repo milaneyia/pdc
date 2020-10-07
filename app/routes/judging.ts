@@ -36,20 +36,20 @@ judgingRouter.get('/', async (ctx) => {
 
     if (contest) {
         contest = await Contest.createQueryBuilder('contest')
-            .leftJoin('contest.songs', 'songs', 'songs.wasChosen = true')
-            .leftJoin('songs.submissions', 'submissions')
-            .leftJoin('songs.category', 'category')
+            .leftJoin('contest.categories', 'categories')
+            .leftJoin('categories.songs', 'songs', 'songs.wasChosen = true')
+            .leftJoin('songs.submissions', 'submissions', 'submissions.anonymisedAs IS NOT NULL')
             .select([
                 'contest.id',
                 'contest.judgingStartedAt',
                 'contest.judgingEndedAt',
+                'categories.id',
+                'categories.name',
                 'songs.id',
                 'songs.artist',
                 'songs.title',
                 'submissions.id',
                 'submissions.anonymisedAs',
-                'category.id',
-                'category.name',
             ])
             .where('contest.id = :contestId', { contestId: contest.id })
             .orderBy('submissions.anonymisedAs')
@@ -140,17 +140,17 @@ judgingRouter.post('/save', async (ctx) => {
     };
 });
 
-judgingRouter.get('/downloadZip/:songId', async (ctx, next) => {
-    const songId = convertToIntOrThrow(ctx.params.songId);
-    const song = ctx.state.contest.songs.find(s => s.id === songId);
+judgingRouter.get('/downloadZip/:categoryId', async (ctx, next) => {
+    const categoryId = convertToIntOrThrow(ctx.params.categoryId);
+    const category = ctx.state.contest.categories.find(c => c.id === categoryId);
 
-    if (!song) {
+    if (!category) {
         return ctx.body = {
             error: 'oops',
         };
     }
 
-    ctx.state.song = song;
+    ctx.state.category = category;
 
     return await next();
 }, downloadAnonymousZip);
