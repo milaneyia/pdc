@@ -22,7 +22,7 @@ const Role_1 = require("../models/Role");
 const resultsRouter = new router_1.default();
 resultsRouter.prefix('/api/results');
 resultsRouter.get('/', (ctx) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c, _d, _e;
+    var _a, _b, _c, _d, _e, _f, _g;
     let user;
     if (ctx.session.osuId) {
         user = yield User_1.User.findOne({
@@ -36,13 +36,17 @@ resultsRouter.get('/', (ctx) => __awaiter(void 0, void 0, void 0, function* () {
         Contest_1.Contest.findForResults(user === undefined),
         Criteria_1.Criteria.find({}),
     ]);
-    const judges = (_e = (_d = (_c = (_b = (_a = contest === null || contest === void 0 ? void 0 : contest.songs) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.submissions) === null || _c === void 0 ? void 0 : _c[0]) === null || _d === void 0 ? void 0 : _d.judging) === null || _e === void 0 ? void 0 : _e.map(j => j.judge);
+    const judges = (_g = (_f = (_e = (_d = (_c = (_b = (_a = contest === null || contest === void 0 ? void 0 : contest.categories) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.songs) === null || _c === void 0 ? void 0 : _c[0]) === null || _d === void 0 ? void 0 : _d.submissions) === null || _e === void 0 ? void 0 : _e[0]) === null || _f === void 0 ? void 0 : _f.judging) === null || _g === void 0 ? void 0 : _g.map(j => j.judge);
     const results = [];
     if (contest) {
-        for (const song of contest.songs) {
-            const { usersScores, judgesCorrel } = helpers_1.calculateScores(song);
+        for (const category of contest.categories) {
+            const submissions = [];
+            for (const song of category.songs) {
+                submissions.push(...song.submissions);
+            }
+            const { usersScores, judgesCorrel } = helpers_1.calculateScores(submissions);
             results.push({
-                id: song.id,
+                id: category.id,
                 usersScores,
                 judgesCorrel,
             });
@@ -73,20 +77,20 @@ resultsRouter.get('/download/:id', downloadSubmission_1.findSubmission, (ctx, ne
     }
     return yield next();
 }), downloadSubmission_1.downloadOriginal);
-resultsRouter.get('/downloadZip/:id/:songId', (ctx, next) => __awaiter(void 0, void 0, void 0, function* () {
+resultsRouter.get('/downloadZip/:id/:categoryId', (ctx, next) => __awaiter(void 0, void 0, void 0, function* () {
     const id = helpers_1.convertToIntOrThrow(ctx.params.id);
-    const songId = helpers_1.convertToIntOrThrow(ctx.params.songId);
+    const categoryId = helpers_1.convertToIntOrThrow(ctx.params.categoryId);
     const contest = yield Contest_1.Contest.findOneOrFail({
         where: { id },
-        relations: ['songs'],
+        relations: ['categories'],
     });
-    const song = contest.songs.find(s => s.id === songId);
-    if (new Date(contest.resultsAt) > new Date() || !song) {
+    const category = contest.categories.find(c => c.id === categoryId);
+    if (new Date(contest.resultsAt) > new Date() || !category) {
         return ctx.body = {
             error: 'Unauthorized',
         };
     }
-    ctx.state.song = song;
+    ctx.state.category = category;
     return yield next();
 }), downloadSubmission_1.downloadOriginalZip);
 exports.default = resultsRouter;

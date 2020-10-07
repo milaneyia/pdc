@@ -26,10 +26,7 @@ submissionsRouter.prefix('/api/submissions');
 submissionsRouter.get('/', (ctx) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield User_1.User.findByOsuId(ctx.session.osuId);
     const [submissions, contest] = yield Promise.all([
-        Submission_1.Submission.find({
-            where: { user },
-            relations: ['song'],
-        }),
+        Submission_1.Submission.findUserSubmissions(user === null || user === void 0 ? void 0 : user.id),
         Contest_1.Contest.findForSubmissions(),
     ]);
     ctx.body = {
@@ -60,12 +57,18 @@ submissionsRouter.post('/save', authentication_1.authenticate, koa_body_1.defaul
             error: 'Select an .osz file',
         };
     }
+    const submissions = yield Submission_1.Submission.findUserSubmissions(user.id);
+    let submission = submissions.find(s => s.songId === song.id);
+    if (!submission) {
+        const sameCategory = submissions.filter(s => s.song.categoryId === song.categoryId);
+        if (sameCategory.length) {
+            return ctx.body = {
+                error: 'You can only submit 1 song per category',
+            };
+        }
+    }
     const paths = helpers_1.generateOriginalPaths(song, user);
     yield helpers_1.saveFile(oszFile.path, paths.finalDir, paths.finalPath);
-    let submission = yield Submission_1.Submission.findOne({
-        user,
-        song,
-    });
     if (!submission) {
         submission = new Submission_1.Submission();
         submission.user = user;

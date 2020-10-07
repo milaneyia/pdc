@@ -60,10 +60,10 @@ function saveFile(inputPath, outputDir, outputPath) {
     });
 }
 exports.saveFile = saveFile;
-function generateZipPaths(baseDir, song) {
-    const finalDir = path_1.default.join(baseDir, song.id.toString());
-    const finalPath = path_1.default.join(finalDir, `${song.id}.zip`);
-    const outputFilename = `${song.title}.zip`;
+function generateZipPaths(baseDir, category) {
+    const finalDir = path_1.default.join(baseDir, category.id.toString());
+    const finalPath = path_1.default.join(finalDir, `${category.id}.zip`);
+    const outputFilename = `${category.name}.zip`;
     return {
         finalDir,
         finalPath,
@@ -73,7 +73,7 @@ function generateZipPaths(baseDir, song) {
 function generatePaths(baseDir, song, user, anonymisedAs) {
     const finalDir = path_1.default.join(baseDir, song.id.toString());
     let finalPath = path_1.default.join(finalDir, user.id.toString());
-    let outputFilename = `${user.username}.osz`;
+    let outputFilename = `${user.username} - ${song.title}.osz`;
     if (anonymisedAs) {
         finalPath = path_1.default.join(finalDir, anonymisedAs);
         outputFilename = `${anonymisedAs}.osz`;
@@ -94,14 +94,14 @@ function generateOriginalPaths(song, user) {
     return generatePaths(baseDir, song, user);
 }
 exports.generateOriginalPaths = generateOriginalPaths;
-function generateAnonymizedZipPaths(song) {
-    const baseDir = path_1.default.join(__dirname, '../osz/anom/');
-    return generateZipPaths(baseDir, song);
+function generateAnonymizedZipPaths(category) {
+    const baseDir = path_1.default.join(__dirname, '../osz/zips/anom/');
+    return generateZipPaths(baseDir, category);
 }
 exports.generateAnonymizedZipPaths = generateAnonymizedZipPaths;
-function generateOriginalZipPaths(song) {
-    const baseDir = path_1.default.join(__dirname, '../osz/originals/');
-    return generateZipPaths(baseDir, song);
+function generateOriginalZipPaths(category) {
+    const baseDir = path_1.default.join(__dirname, '../osz/zips/originals/');
+    return generateZipPaths(baseDir, category);
 }
 exports.generateOriginalZipPaths = generateOriginalZipPaths;
 function generateTemplatePaths(song) {
@@ -115,18 +115,17 @@ function generateTemplatePaths(song) {
     };
 }
 exports.generateTemplatePaths = generateTemplatePaths;
-function calculateScores(song) {
-    var _a, _b, _c, _d, _e;
+function calculateScores(submissions) {
+    var _a, _b, _c, _d;
     const usersScores = [];
     const judgesCorrel = [];
-    if (!song || !song.submissions.length) {
+    if (!submissions.length) {
         return {
             usersScores,
             judgesCorrel,
         };
     }
-    const judges = (_c = (_b = (_a = song.submissions) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.judging) === null || _c === void 0 ? void 0 : _c.map(j => j.judge);
-    const submissions = song.submissions;
+    const judges = (_b = (_a = submissions === null || submissions === void 0 ? void 0 : submissions[0]) === null || _a === void 0 ? void 0 : _a.judging) === null || _b === void 0 ? void 0 : _b.map(j => j.judge);
     for (const submission of submissions) {
         const userScore = {
             user: submission.user,
@@ -167,7 +166,7 @@ function calculateScores(song) {
             let judgeSd = 0;
             let judgeStdSum = 0;
             for (const teamScore of usersScores) {
-                judgeSum += ((_d = teamScore.judgingSum.find(j => j.judgeId === judgeId)) === null || _d === void 0 ? void 0 : _d.sum) || 0;
+                judgeSum += ((_c = teamScore.judgingSum.find(j => j.judgeId === judgeId)) === null || _c === void 0 ? void 0 : _c.sum) || 0;
             }
             judgeAvg = judgeSum / usersScores.length;
             for (const teamScore of usersScores) {
@@ -197,7 +196,7 @@ function calculateScores(song) {
         const totalStdAvg = usersScores.reduce((acc, s) => acc + s.standardizedFinalScore, 0) / usersScores.length;
         for (const judgeId of judgesIds) {
             const i = judgesCorrel.findIndex(j => j.id === judgeId);
-            const judgeAvg = ((_e = judgesCorrel === null || judgesCorrel === void 0 ? void 0 : judgesCorrel[i]) === null || _e === void 0 ? void 0 : _e.avg) || 0;
+            const judgeAvg = ((_d = judgesCorrel === null || judgesCorrel === void 0 ? void 0 : judgesCorrel[i]) === null || _d === void 0 ? void 0 : _d.avg) || 0;
             let sum1 = 0;
             let sum2 = 0;
             let sum3 = 0;

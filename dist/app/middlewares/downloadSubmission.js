@@ -22,6 +22,7 @@ function findSubmission(ctx, next) {
         const submission = yield Submission_1.Submission.findOneOrFail({
             where: { id },
             relations: [
+                'user',
                 'song',
                 'song.contest',
             ],
@@ -44,7 +45,7 @@ function downloadAnonymous(ctx) {
         const submission = ctx.state.submission;
         if (!submission.anonymisedAs)
             throw new Error('Not yet created');
-        const paths = helpers_1.generateAnonymizedPaths(submission.song, ctx.state.user, submission.anonymisedAs);
+        const paths = helpers_1.generateAnonymizedPaths(submission.song, submission.user, submission.anonymisedAs);
         yield downloadFile(ctx, paths.finalPath, paths.outputFilename);
     });
 }
@@ -52,23 +53,23 @@ exports.downloadAnonymous = downloadAnonymous;
 function downloadOriginal(ctx) {
     return __awaiter(this, void 0, void 0, function* () {
         const submission = ctx.state.submission;
-        const paths = helpers_1.generateOriginalPaths(submission.song, ctx.state.user);
+        const paths = helpers_1.generateOriginalPaths(submission.song, submission.user);
         yield downloadFile(ctx, paths.finalPath, paths.outputFilename);
     });
 }
 exports.downloadOriginal = downloadOriginal;
 function downloadAnonymousZip(ctx) {
     return __awaiter(this, void 0, void 0, function* () {
-        const song = ctx.state.song;
-        const paths = helpers_1.generateAnonymizedZipPaths(song);
+        const category = ctx.state.category;
+        const paths = helpers_1.generateAnonymizedZipPaths(category);
         yield downloadFile(ctx, paths.finalPath, paths.outputFilename);
     });
 }
 exports.downloadAnonymousZip = downloadAnonymousZip;
 function downloadOriginalZip(ctx) {
     return __awaiter(this, void 0, void 0, function* () {
-        const song = ctx.state.song;
-        const paths = helpers_1.generateOriginalZipPaths(song);
+        const category = ctx.state.category;
+        const paths = helpers_1.generateOriginalZipPaths(category);
         yield downloadFile(ctx, paths.finalPath, paths.outputFilename);
     });
 }

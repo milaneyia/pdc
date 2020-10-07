@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Song = void 0;
 const typeorm_1 = require("typeorm");
+const Category_1 = require("./Category");
 const Contest_1 = require("./Contest");
 const Submission_1 = require("./Submission");
 const Vote_1 = require("./Vote");
@@ -48,6 +49,14 @@ __decorate([
     typeorm_1.ManyToOne(() => Contest_1.Contest, (contest) => contest.songs, { nullable: false }),
     __metadata("design:type", Contest_1.Contest)
 ], Song.prototype, "contest", void 0);
+__decorate([
+    typeorm_1.Column({ nullable: true }),
+    __metadata("design:type", Number)
+], Song.prototype, "categoryId", void 0);
+__decorate([
+    typeorm_1.ManyToOne(() => Category_1.Category, (category) => category.songs),
+    __metadata("design:type", Category_1.Category)
+], Song.prototype, "category", void 0);
 __decorate([
     typeorm_1.OneToMany(() => Submission_1.Submission, (submission) => submission.song),
     __metadata("design:type", Array)

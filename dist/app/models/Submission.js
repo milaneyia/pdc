@@ -15,6 +15,15 @@ const Judging_1 = require("./judging/Judging");
 const User_1 = require("./User");
 const Song_1 = require("./Song");
 let Submission = class Submission extends typeorm_1.BaseEntity {
+    static findUserSubmissions(userId) {
+        return this.find({
+            where: { userId },
+            relations: [
+                'song',
+                'song.category',
+            ],
+        });
+    }
 };
 __decorate([
     typeorm_1.PrimaryGeneratedColumn(),

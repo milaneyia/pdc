@@ -18,25 +18,22 @@ const router_1 = __importDefault(require("@koa/router"));
 const koa_body_1 = __importDefault(require("koa-body"));
 const helpers_1 = require("../../helpers");
 const authentication_1 = require("../../middlewares/authentication");
-const Submission_1 = require("../../models/Submission");
 const downloadSubmission_1 = require("../../middlewares/downloadSubmission");
-const Song_1 = require("../../models/Song");
+const Submission_1 = require("../../models/Submission");
+const Category_1 = require("../../models/Category");
 const submissionsAdminRouter = new router_1.default();
 submissionsAdminRouter.prefix('/api/admin/submissions');
 submissionsAdminRouter.use(authentication_1.authenticate);
 submissionsAdminRouter.use(authentication_1.isStaff);
 submissionsAdminRouter.get('/', (ctx) => __awaiter(void 0, void 0, void 0, function* () {
-    const songs = yield Song_1.Song.find({
-        where: {
-            wasChosen: true,
-        },
-        relations: [
-            'submissions',
-            'submissions.user',
-        ],
-    });
+    const categories = yield Category_1.Category.createQueryBuilder('category')
+        .leftJoinAndSelect('category.songs', 'songs')
+        .leftJoinAndSelect('songs.submissions', 'submissions')
+        .leftJoinAndSelect('submissions.user', 'user')
+        .where('songs.wasChosen = true')
+        .getMany();
     ctx.body = {
-        songs,
+        categories,
     };
 }));
 submissionsAdminRouter.post('/:id/save', koa_body_1.default({
@@ -65,6 +62,7 @@ submissionsAdminRouter.post('/:id/save', koa_body_1.default({
         },
         relations: [
             'song',
+            'user',
         ],
     });
     const paths = helpers_1.generateAnonymizedPaths(submission.song, submission.user, anonymisedAs);
@@ -77,38 +75,41 @@ submissionsAdminRouter.post('/:id/save', koa_body_1.default({
 }));
 submissionsAdminRouter.get('/:id/download', downloadSubmission_1.findSubmission, downloadSubmission_1.downloadOriginal);
 submissionsAdminRouter.get('/:id/downloadAnom', downloadSubmission_1.findSubmission, downloadSubmission_1.downloadAnonymous);
-submissionsAdminRouter.post('/:id/generateZip', (ctx) => __awaiter(void 0, void 0, void 0, function* () {
+submissionsAdminRouter.post('/:categoryId/generateZip', (ctx) => __awaiter(void 0, void 0, void 0, function* () {
     const anomType = ctx.request.body.type === 'anom';
-    const songId = helpers_1.convertToIntOrThrow(ctx.params.id);
-    const song = yield Song_1.Song.findOneOrFail({
+    const categoryId = helpers_1.convertToIntOrThrow(ctx.params.categoryId);
+    const category = yield Category_1.Category.findOneOrFail({
         where: {
-            id: songId,
+            id: categoryId,
         },
         relations: [
-            'submissions',
-            'submissions.user',
+            'songs',
+            'songs.submissions',
+            'songs.submissions.user',
         ],
     });
     const zip = new jszip_1.default();
-    for (const submission of song.submissions) {
-        let paths;
-        if (anomType) {
-            if (!submission.anonymisedAs)
-                continue;
-            paths = helpers_1.generateAnonymizedPaths(song, submission.user, submission.anonymisedAs);
+    for (const song of category.songs) {
+        for (const submission of song.submissions) {
+            let paths;
+            if (anomType) {
+                if (!submission.anonymisedAs)
+                    continue;
+                paths = helpers_1.generateAnonymizedPaths(song, submission.user, submission.anonymisedAs);
+            }
+            else {
+                paths = helpers_1.generateOriginalPaths(song, submission.user);
+            }
+            yield helpers_1.checkFileExistence(paths.finalPath);
+            zip.file(paths.outputFilename, fs_1.default.createReadStream(paths.finalPath));
         }
-        else {
-            paths = helpers_1.generateOriginalPaths(song, submission.user);
-        }
-        yield helpers_1.checkFileExistence(paths.finalPath);
-        zip.file(paths.outputFilename, fs_1.default.createReadStream(paths.finalPath));
     }
     let paths;
     if (anomType) {
-        paths = helpers_1.generateAnonymizedZipPaths(song);
+        paths = helpers_1.generateAnonymizedZipPaths(category);
     }
     else {
-        paths = helpers_1.generateOriginalZipPaths(song);
+        paths = helpers_1.generateOriginalZipPaths(category);
     }
     yield fs_1.default.promises.mkdir(paths.finalDir, { recursive: true });
     const content = yield zip.generateAsync({ type: 'nodebuffer' });
@@ -118,16 +119,16 @@ submissionsAdminRouter.post('/:id/generateZip', (ctx) => __awaiter(void 0, void 
         success: 'Ok',
     };
 }));
-function findSong(ctx, next) {
+function findCategory(ctx, next) {
     return __awaiter(this, void 0, void 0, function* () {
-        const id = helpers_1.convertToIntOrThrow(ctx.params.songId);
-        const song = yield Song_1.Song.findOneOrFail({
+        const id = helpers_1.convertToIntOrThrow(ctx.params.categoryId);
+        const category = yield Category_1.Category.findOneOrFail({
             id,
         });
-        ctx.state.song = song;
+        ctx.state.category = category;
         return yield next();
     });
 }
-submissionsAdminRouter.get('/:songId/downloadZip', findSong, downloadSubmission_1.downloadOriginalZip);
-submissionsAdminRouter.get('/:songId/downloadAnomZip', findSong, downloadSubmission_1.downloadAnonymousZip);
+submissionsAdminRouter.get('/:categoryId/downloadZip', findCategory, downloadSubmission_1.downloadOriginalZip);
+submissionsAdminRouter.get('/:categoryId/downloadAnomZip', findCategory, downloadSubmission_1.downloadAnonymousZip);
 exports.default = submissionsAdminRouter;

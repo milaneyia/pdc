@@ -38,16 +38,15 @@ const Contest_1 = require("../models/Contest");
 const User_1 = require("../models/User");
 const indexRouter = new router_1.default();
 indexRouter.get('/api/', (ctx) => __awaiter(void 0, void 0, void 0, function* () {
-    const contest = yield Contest_1.Contest.findForResults();
     const osuId = ctx.session.osuId;
     let user;
     if (osuId) {
         user = yield User_1.User.findByOsuId(osuId);
     }
+    const contest = yield Contest_1.Contest.findForResults(user === null || user === void 0 ? void 0 : user.isStaff);
     ctx.body = {
         contest,
         user,
-        lang: ctx.session.lang,
     };
 }));
 indexRouter.get('/login', (ctx) => {

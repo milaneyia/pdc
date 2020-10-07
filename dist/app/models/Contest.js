@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Contest = void 0;
 const typeorm_1 = require("typeorm");
+const Category_1 = require("./Category");
 const Song_1 = require("./Song");
 let Contest = class Contest extends typeorm_1.BaseEntity {
     static findForVoting(userId) {
@@ -37,6 +38,7 @@ let Contest = class Contest extends typeorm_1.BaseEntity {
         const today = new Date();
         return this.createQueryBuilder('contest')
             .leftJoinAndSelect('contest.songs', 'songs', 'songs.wasChosen = true')
+            .leftJoinAndSelect('songs.category', 'category')
             .where('submissionsEndedAt >= :today', { today })
             .andWhere('submissionsStartedAt <= :today', { today })
             .getOne();
@@ -44,7 +46,8 @@ let Contest = class Contest extends typeorm_1.BaseEntity {
     static findForJudging() {
         const today = new Date();
         return this.createQueryBuilder('contest')
-            .leftJoinAndSelect('contest.songs', 'songs', 'songs.wasChosen = true')
+            .leftJoinAndSelect('contest.categories', 'categories')
+            .leftJoinAndSelect('categories.songs', 'songs', 'songs.wasChosen = true')
             .where('judgingEndedAt >= :today', { today })
             .andWhere('judgingStartedAt <= :today', { today })
             .getOne();
@@ -52,7 +55,8 @@ let Contest = class Contest extends typeorm_1.BaseEntity {
     static findLastJudgingContest() {
         const today = new Date();
         return this.createQueryBuilder('contest')
-            .leftJoinAndSelect('contest.songs', 'songs', 'songs.wasChosen = true')
+            .leftJoinAndSelect('contest.categories', 'categories')
+            .leftJoinAndSelect('categories.songs', 'songs', 'songs.wasChosen = true')
             .where('judgingEndedAt <= :today', { today })
             .orderBy({
             judgingEndedAt: 'DESC',
@@ -63,8 +67,10 @@ let Contest = class Contest extends typeorm_1.BaseEntity {
         if (restricted) {
             return this
                 .createQueryBuilder('contest')
-                .leftJoinAndSelect('contest.songs', 'songs', 'songs.wasChosen = true')
+                .leftJoinAndSelect('contest.categories', 'categories')
+                .leftJoinAndSelect('categories.songs', 'songs', 'songs.wasChosen = true')
                 .leftJoinAndSelect('songs.submissions', 'submissions', 'contest.resultsAt <= :today', { today: new Date() })
+                .leftJoinAndSelect('submissions.user', 'user')
                 .leftJoinAndSelect('submissions.judging', 'judging')
                 .leftJoinAndSelect('judging.judge', 'judge')
                 .leftJoinAndSelect('judging.judgingToCriterias', 'judgingToCriterias')
@@ -73,12 +79,14 @@ let Contest = class Contest extends typeorm_1.BaseEntity {
         }
         return this.findOne({
             relations: [
-                'songs',
-                'songs.submissions',
-                'songs.submissions.judging',
-                'songs.submissions.judging.judge',
-                'songs.submissions.judging.judgingToCriterias',
-                'songs.submissions.judging.judgingToCriterias.criteria',
+                'categories',
+                'categories.songs',
+                'categories.songs.submissions',
+                'categories.songs.submissions.user',
+                'categories.songs.submissions.judging',
+                'categories.songs.submissions.judging.judge',
+                'categories.songs.submissions.judging.judgingToCriterias',
+                'categories.songs.submissions.judging.judgingToCriterias.criteria',
             ],
         });
     }
@@ -119,6 +127,10 @@ __decorate([
     typeorm_1.OneToMany(() => Song_1.Song, (song) => song.contest),
     __metadata("design:type", Array)
 ], Contest.prototype, "songs", void 0);
+__decorate([
+    typeorm_1.OneToMany(() => Category_1.Category, (category) => category.contest),
+    __metadata("design:type", Array)
+], Contest.prototype, "categories", void 0);
 __decorate([
     typeorm_1.CreateDateColumn(),
     __metadata("design:type", Date)

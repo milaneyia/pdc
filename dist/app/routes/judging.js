@@ -42,12 +42,15 @@ judgingRouter.get('/', (ctx) => __awaiter(void 0, void 0, void 0, function* () {
     let contest = ctx.state.contest || ctx.state.lastContest;
     if (contest) {
         contest = yield Contest_1.Contest.createQueryBuilder('contest')
-            .leftJoin('contest.songs', 'songs')
-            .leftJoin('songs.submissions', 'submissions')
+            .leftJoin('contest.categories', 'categories')
+            .leftJoin('categories.songs', 'songs', 'songs.wasChosen = true')
+            .leftJoin('songs.submissions', 'submissions', 'submissions.anonymisedAs IS NOT NULL')
             .select([
             'contest.id',
             'contest.judgingStartedAt',
             'contest.judgingEndedAt',
+            'categories.id',
+            'categories.name',
             'songs.id',
             'songs.artist',
             'songs.title',
@@ -129,23 +132,16 @@ judgingRouter.post('/save', (ctx) => __awaiter(void 0, void 0, void 0, function*
         success: 'Saved!',
     };
 }));
-judgingRouter.get('/downloadZip/:songId', (ctx, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const songId = helpers_1.convertToIntOrThrow(ctx.params.songId);
-    const song = ctx.state.contest.songs.find(s => s.id === songId);
-    if (!song) {
+judgingRouter.get('/downloadZip/:categoryId', (ctx, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const categoryId = helpers_1.convertToIntOrThrow(ctx.params.categoryId);
+    const category = ctx.state.contest.categories.find(c => c.id === categoryId);
+    if (!category) {
         return ctx.body = {
             error: 'oops',
         };
     }
-    ctx.state.song = song;
+    ctx.state.category = category;
     return yield next();
 }), downloadSubmission_1.downloadAnonymousZip);
-judgingRouter.get('/submission/:id/download', downloadSubmission_1.findSubmission, (ctx, next) => __awaiter(void 0, void 0, void 0, function* () {
-    if (ctx.state.contest.id !== ctx.state.submission.match.roundId) {
-        return ctx.body = {
-            error: 'oops',
-        };
-    }
-    return yield next();
-}), downloadSubmission_1.downloadAnonymous);
+judgingRouter.get('/submission/:id/download', downloadSubmission_1.findSubmission, downloadSubmission_1.downloadAnonymous);
 exports.default = judgingRouter;
