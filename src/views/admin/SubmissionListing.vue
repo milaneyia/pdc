@@ -8,13 +8,13 @@
                 Also generate zips for faster download before judging is started
             </p>
 
-            <select v-model="selectedSongId" class="form-control mt-3">
+            <select v-model="selectedCategoryId" class="form-control mt-3">
                 <option
-                    v-for="song in songs"
-                    :key="song.id"
-                    :value="song.id"
+                    v-for="category in categories"
+                    :key="category.id"
+                    :value="category.id"
                 >
-                    {{ song.artist }} - {{ song.title }}
+                    {{ category.name }}
                 </option>
             </select>
 
@@ -23,7 +23,7 @@
             </button>
 
             <a
-                :href="`/api/admin/songs/${selectedSongId}/downloadZip`"
+                :href="`/api/admin/submissions/${selectedCategoryId}/downloadZip`"
                 class="btn btn-sm btn-primary mt-2 mx-1"
                 target="_blank"
             >
@@ -35,7 +35,7 @@
             </button>
 
             <a
-                :href="`/api/admin/songs/${selectedSongId}/downloadAnomZip`"
+                :href="`/api/admin/submissions/${selectedCategoryId}/downloadAnomZip`"
                 class="btn btn-sm btn-primary mt-2 mx-1"
                 target="_blank"
             >
@@ -43,99 +43,105 @@
             </a>
         </page-header>
 
-        <div v-if="selectedSong" class="card">
-            <data-table
-                v-if="selectedSong.submissions.length"
-                :headers="[
-                    'Team',
-                    'Submission Date',
-                    'Original Link',
-                    'Anonymised As',
-                    'Anonymised Link',
-                    '',
-                ]"
-            >
-                <tr
-                    v-for="submission in selectedSong.submissions"
-                    :key="submission.id"
-                >
-                    <td>{{ submission.user.username }}</td>
-                    <td>{{ submission.updatedAt | shortDateTimeString }}</td>
-                    <td>
-                        <a
-                            v-if="submission.originalPath"
-                            :href="`/api/admin/submissions/${submission.id}/download`"
-                        >
-                            download
-                        </a>
-                    </td>
-                    <td>
-                        <input
-                            v-if="editing == submission.id"
-                            v-model="anonymisedAs"
-                            type="text"
-                            class="form-control form-control-sm"
-                            maxlength="255"
-                        >
-
-                        <span v-else>{{ submission.anonymisedAs }}</span>
-                    </td>
-                    <td>
-                        <input
-                            v-if="editing == submission.id"
-                            type="file"
-                            class="form-control form-control-sm"
-                            maxlength="255"
-                            @change="oszFile = $event.target.files[0]"
-                        >
-
-                        <a
-                            v-else-if="submission.anonymisedAs"
-                            :href="`/api/admin/submissions/${submission.id}/downloadAnom`"
-                        >
-                            download
-                        </a>
-                    </td>
-                    <td>
-                        <template v-if="editing == submission.id">
-                            <button
-                                class="btn btn-sm btn-secondary mb-2 mb-lg-0"
-                                @click="cancel"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                class="btn btn-sm btn-success"
-                                @click="save(submission, $event)"
-                            >
-                                <div
-                                    v-if="isSaving"
-                                    class="spinner-border spinner-border-sm align-middle"
-                                    role="status"
-                                >
-                                    <span class="sr-only">Loading...</span>
-                                </div>
-                                <span v-else>Save</span>
-                            </button>
-                        </template>
-
-                        <button
-                            v-else-if="!editing"
-                            class="btn btn-sm btn-primary"
-                            @click="edit(submission.id, submission.anonymisedAs)"
-                        >
-                            Edit
-                        </button>
-                    </td>
-                </tr>
-            </data-table>
-
+        <div v-if="selectedCategory">
             <div
-                v-else
-                class="card-body"
+                v-for="song in selectedCategory.songs"
+                :key="song.id"
+                class="card my-2"
             >
-                No submissions
+                <div class="card-header">
+                    <b>{{ song.title }}</b>
+                </div>
+
+                <data-table
+                    :headers="[
+                        'User',
+                        'Submission Date',
+                        'Original Link',
+                        'Anonymised As',
+                        'Anonymised Link',
+                        '',
+                    ]"
+                >
+                    <tr
+                        v-for="submission in song.submissions"
+                        :key="submission.id"
+                    >
+                        <td>{{ submission.user.username }}</td>
+                        <td>{{ submission.updatedAt | shortDateTimeString }}</td>
+                        <td>
+                            <a :href="`/api/admin/submissions/${submission.id}/download`">
+                                download
+                            </a>
+                        </td>
+                        <td>
+                            <input
+                                v-if="editing == submission.id"
+                                v-model="anonymisedAs"
+                                type="text"
+                                class="form-control form-control-sm"
+                                maxlength="255"
+                            >
+
+                            <span v-else>{{ submission.anonymisedAs }}</span>
+                        </td>
+                        <td>
+                            <input
+                                v-if="editing == submission.id"
+                                type="file"
+                                class="form-control form-control-sm"
+                                maxlength="255"
+                                @change="oszFile = $event.target.files[0]"
+                            >
+
+                            <a
+                                v-else-if="submission.anonymisedAs"
+                                :href="`/api/admin/submissions/${submission.id}/downloadAnom`"
+                            >
+                                download
+                            </a>
+                        </td>
+                        <td>
+                            <template v-if="editing == submission.id">
+                                <button
+                                    class="btn btn-sm btn-secondary mb-2 mb-lg-0"
+                                    @click="cancel"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    class="btn btn-sm btn-success"
+                                    @click="save(submission, $event)"
+                                >
+                                    <div
+                                        v-if="isSaving"
+                                        class="spinner-border spinner-border-sm align-middle"
+                                        role="status"
+                                    >
+                                        <span class="sr-only">Loading...</span>
+                                    </div>
+                                    <span v-else>Save</span>
+                                </button>
+                            </template>
+
+                            <button
+                                v-else-if="!editing"
+                                class="btn btn-sm btn-primary"
+                                @click="edit(submission.id, submission.anonymisedAs)"
+                            >
+                                Edit
+                            </button>
+                        </td>
+                    </tr>
+                </data-table>
             </div>
+        </div>
+
+        <div
+            v-else
+            class="card card-body"
+        >
+            No submissions
         </div>
     </div>
 </template>
@@ -155,24 +161,24 @@ import { Song, Submission } from '../../interfaces';
 })
 export default class SubmissionListing extends Vue {
 
-    songs: Song[] = [];
+    categories: Song[] = [];
     editing: null | number = null;
     anonymisedAs = '';
     oszFile: File | null = null;
     isSaving = false;
-    selectedSongId = 1;
+    selectedCategoryId = 1;
 
     async created (): Promise<void> {
         await this.getData();
     }
 
-    get selectedSong (): Song | undefined {
-        return this.songs.find(r => r.id === this.selectedSongId);
+    get selectedCategory (): Song | undefined {
+        return this.categories.find(r => r.id === this.selectedCategoryId);
     }
 
     async getData (): Promise<void> {
-        const data = await this.initialRequest<{ songs: [] }>('/api/admin/submissions');
-        if (data?.songs) this.songs = data.songs;
+        const data = await this.initialRequest<{ categories: [] }>('/api/admin/submissions');
+        if (data?.categories) this.categories = data.categories;
     }
 
     async save (submission: Submission, e: Event): Promise<void> {
@@ -202,13 +208,13 @@ export default class SubmissionListing extends Vue {
     }
 
     async generateZip (e: Event): Promise<void> {
-        await this.postRequest(`/api/admin/songs/${this.selectedSongId}/generateZip`, {
+        await this.postRequest(`/api/admin/submissions/${this.selectedCategoryId}/generateZip`, {
             type: 'original',
         }, e);
     }
 
     async generateAnomZip (e: Event): Promise<void> {
-        await this.postRequest(`/api/admin/songs/${this.selectedSongId}/generateZip`, {
+        await this.postRequest(`/api/admin/submissions/${this.selectedCategoryId}/generateZip`, {
             type: 'anom',
         }, e);
     }

@@ -6,6 +6,16 @@ import { Song } from './Song';
 @Entity()
 export class Submission extends BaseEntity {
 
+    static findUserSubmissions(userId?: number): Promise<Submission[]> {
+        return this.find({
+            where: { userId },
+            relations: [
+                'song',
+                'song.category',
+            ],
+        });
+    }
+
     @PrimaryGeneratedColumn()
     id!: number;
 

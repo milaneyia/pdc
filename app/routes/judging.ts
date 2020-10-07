@@ -36,12 +36,15 @@ judgingRouter.get('/', async (ctx) => {
 
     if (contest) {
         contest = await Contest.createQueryBuilder('contest')
-            .leftJoin('contest.songs', 'songs')
-            .leftJoin('songs.submissions', 'submissions')
+            .leftJoin('contest.categories', 'categories')
+            .leftJoin('categories.songs', 'songs', 'songs.wasChosen = true')
+            .leftJoin('songs.submissions', 'submissions', 'submissions.anonymisedAs IS NOT NULL')
             .select([
                 'contest.id',
                 'contest.judgingStartedAt',
                 'contest.judgingEndedAt',
+                'categories.id',
+                'categories.name',
                 'songs.id',
                 'songs.artist',
                 'songs.title',
@@ -137,29 +140,21 @@ judgingRouter.post('/save', async (ctx) => {
     };
 });
 
-judgingRouter.get('/downloadZip/:songId', async (ctx, next) => {
-    const songId = convertToIntOrThrow(ctx.params.songId);
-    const song = ctx.state.contest.songs.find(s => s.id === songId);
+judgingRouter.get('/downloadZip/:categoryId', async (ctx, next) => {
+    const categoryId = convertToIntOrThrow(ctx.params.categoryId);
+    const category = ctx.state.contest.categories.find(c => c.id === categoryId);
 
-    if (!song) {
+    if (!category) {
         return ctx.body = {
             error: 'oops',
         };
     }
 
-    ctx.state.song = song;
+    ctx.state.category = category;
 
     return await next();
 }, downloadAnonymousZip);
 
-judgingRouter.get('/submission/:id/download', findSubmission, async (ctx, next) => {
-    if (ctx.state.contest.id !== ctx.state.submission.match.roundId) {
-        return ctx.body = {
-            error: 'oops',
-        };
-    }
-
-    return await next();
-}, downloadAnonymous);
+judgingRouter.get('/submission/:id/download', findSubmission, downloadAnonymous);
 
 export default judgingRouter;

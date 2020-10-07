@@ -5,7 +5,7 @@ import { Contest } from '../models/Contest';
 import { User } from '../models/User';
 import { findSubmission, downloadOriginalZip, downloadOriginal } from '../middlewares/downloadSubmission';
 import { Submission } from '../models/Submission';
-import { calculateScores, convertToIntOrThrow, JudgeCorrel, UserScore } from '../helpers';
+import { calculateScores, convertToIntOrThrow, Results } from '../helpers';
 import { ROLE } from '../models/Role';
 
 const resultsRouter = new Router();
@@ -28,14 +28,20 @@ resultsRouter.get('/', async (ctx: ParameterizedContext) => {
         Contest.findForResults(user === undefined),
         Criteria.find({}),
     ]);
-    const judges = contest?.songs?.[0]?.submissions?.[0]?.judging?.map(j => j.judge);
-    const results: { id: number; usersScores: UserScore[]; judgesCorrel: JudgeCorrel[] }[] = [];
+    const judges = contest?.categories?.[0]?.songs?.[0]?.submissions?.[0]?.judging?.map(j => j.judge);
+    const results: Results[] = [];
 
     if (contest) {
-        for (const song of contest.songs) {
-            const { usersScores, judgesCorrel } = calculateScores(song);
+        for (const category of contest.categories) {
+            const submissions: Submission[] = [];
+
+            for (const song of category.songs) {
+                submissions.push(...song.submissions);
+            }
+
+            const { usersScores, judgesCorrel } = calculateScores(submissions);
             results.push({
-                id: song.id,
+                id: category.id,
                 usersScores,
                 judgesCorrel,
             });
@@ -72,22 +78,22 @@ resultsRouter.get('/download/:id', findSubmission, async (ctx: ParameterizedCont
     return await next();
 }, downloadOriginal);
 
-resultsRouter.get('/downloadZip/:id/:songId', async (ctx: ParameterizedContext, next) => {
+resultsRouter.get('/downloadZip/:id/:categoryId', async (ctx: ParameterizedContext, next) => {
     const id = convertToIntOrThrow(ctx.params.id);
-    const songId = convertToIntOrThrow(ctx.params.songId);
+    const categoryId = convertToIntOrThrow(ctx.params.categoryId);
     const contest = await Contest.findOneOrFail({
         where: { id },
-        relations: ['songs'],
+        relations: ['categories'],
     });
-    const song = contest.songs.find(s => s.id === songId);
+    const category = contest.categories.find(c => c.id === categoryId);
 
-    if (new Date(contest.resultsAt) > new Date() || !song) {
+    if (new Date(contest.resultsAt) > new Date() || !category) {
         return ctx.body = {
             error: 'Unauthorized',
         };
     }
 
-    ctx.state.song = song;
+    ctx.state.category = category;
 
     return await next();
 }, downloadOriginalZip);

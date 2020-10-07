@@ -1,6 +1,6 @@
 import { StoreOptions } from 'vuex';
-import { User, Criteria, Contest } from './interfaces';
-import { UserScore, JudgeCorrel } from '../app/helpers';
+import { User, Criteria, Contest, Category } from './interfaces';
+import { Results } from '../app/helpers';
 
 export interface MainState {
     toast: { message: string; type: string };
@@ -10,8 +10,11 @@ export interface MainState {
     criterias: Criteria[];
     judges: User[];
     contest: Contest | null;
-    usersScores: UserScore[];
-    judgesCorrel: JudgeCorrel[];
+    results: Results[];
+    selectedCategoryId: number;
+    sortBy: 'stdScore' | 'rawScore' | 'criteria' | 'judge';
+    sortDesc: boolean;
+    sortById: number | null;
 }
 
 const store: StoreOptions<MainState> = {
@@ -30,8 +33,11 @@ const store: StoreOptions<MainState> = {
         // Contest
         criterias: [],
         judges: [],
-        usersScores: [],
-        judgesCorrel: [],
+        results: [],
+        selectedCategoryId: 1,
+        sortBy: 'stdScore',
+        sortDesc: true,
+        sortById: null,
     },
     mutations: {
         addToast (state, payload): void {
@@ -54,66 +60,23 @@ const store: StoreOptions<MainState> = {
             state.criterias = payload.criterias || [];
             state.judges = payload.judges || [];
             state.contest = payload.contest;
-            state.usersScores = payload.usersScores;
-            state.judgesCorrel = payload.judgesCorrel;
+            state.results = payload.results;
         },
-        sortByCriteria (state, payload): void {
-            state.usersScores.sort((a, b) => {
-                const criteriaA = a.criteriaSum.find(c => c.criteriaId === payload.criteriaId);
-                const criteriaB = b.criteriaSum.find(c => c.criteriaId === payload.criteriaId);
-                let sumA = 0;
-                let sumB = 0;
-
-                if (criteriaA) sumA = criteriaA.sum;
-                if (criteriaB) sumB = criteriaB.sum;
-
-                if (payload.sortDesc) {
-                    return sumB - sumA;
-                }
-
-                return sumA - sumB;
-            });
+        updateSelectedCategoryId (state, categoryId): void {
+            state.selectedCategoryId = categoryId;
         },
-        sortByJudge (state, payload): void {
-            state.usersScores.sort((a, b) => {
-                const judgeA = a.judgingSum.find(c => c.judgeId === payload.judgeId);
-                const judgeB = b.judgingSum.find(c => c.judgeId === payload.judgeId);
-                let sumA = 0;
-                let sumB = 0;
+        updateSort (state, payload): void {
+            if (state.sortBy === payload.sortBy && (!payload.sortById || state.sortById === payload.sortById)) {
+                state.sortDesc = !state.sortDesc;
+            } else {
+                state.sortBy = payload.sortBy;
+                state.sortDesc = true;
+            }
 
-                if (judgeA) sumA = judgeA.sum;
-                if (judgeB) sumB = judgeB.sum;
-
-                if (payload.sortDesc) {
-                    return sumB - sumA;
-                }
-
-                return sumA - sumB;
-            });
-        },
-        sortByRawScore (state, payload): void {
-            state.usersScores.sort((a, b) => {
-                if (payload.sortDesc) {
-                    return b.rawFinalScore - a.rawFinalScore;
-                }
-
-                return a.rawFinalScore - b.rawFinalScore;
-            });
-        },
-        sortByStdScore (state, payload): void {
-            state.usersScores.sort((a, b) => {
-                if (payload.sortDesc) {
-                    return b.standardizedFinalScore - a.standardizedFinalScore;
-                }
-
-                return a.standardizedFinalScore - b.standardizedFinalScore;
-            });
+            state.sortById = payload.sortById || null;
         },
     },
     getters: {
-        submissionsLength (state): number | undefined {
-            return state.contest?.songs?.[0]?.submissions?.length;
-        },
         isVotingTime (state): boolean | null {
             return state.contest && new Date(state.contest.votingStartedAt) < new Date();
         },
@@ -122,6 +85,62 @@ const store: StoreOptions<MainState> = {
         },
         isResultsTime (state): boolean | null {
             return state.contest && new Date(state.contest.resultsAt) < new Date();
+        },
+        selectedCategory (state): Category | undefined {
+            return state.contest?.categories.find(c => c.id === state.selectedCategoryId);
+        },
+        selectedCategoryResults (state): Results | null {
+            const result = state.results.find(r => r.id === state.selectedCategoryId);
+
+            if (!result) return null;
+
+            if (state.sortBy === 'stdScore') {
+                result.usersScores.sort((a, b) => {
+                    if (state.sortDesc) {
+                        return b.standardizedFinalScore - a.standardizedFinalScore;
+                    }
+
+                    return a.standardizedFinalScore - b.standardizedFinalScore;
+                });
+            } else if (state.sortBy === 'rawScore') {
+                result.usersScores.sort((a, b) => {
+                    if (state.sortDesc) {
+                        return b.rawFinalScore - a.rawFinalScore;
+                    }
+
+                    return a.rawFinalScore - b.rawFinalScore;
+                });
+            } else {
+                result.usersScores.sort((a, b) => {
+                    let sumA = 0;
+                    let sumB = 0;
+
+                    if (state.sortBy === 'criteria') {
+                        const criteriaA = a.criteriaSum.find(c => c.criteriaId === state.sortById);
+                        const criteriaB = b.criteriaSum.find(c => c.criteriaId === state.sortById);
+
+                        if (criteriaA) sumA = criteriaA.sum;
+                        if (criteriaB) sumB = criteriaB.sum;
+                    }
+
+                    if (state.sortBy === 'judge') {
+                        const judgeA = a.judgingSum.find(c => c.judgeId === state.sortById);
+                        const judgeB = b.judgingSum.find(c => c.judgeId === state.sortById);
+
+                        if (judgeA) sumA = judgeA.sum;
+                        if (judgeB) sumB = judgeB.sum;
+                    }
+
+
+                    if (state.sortDesc) {
+                        return sumB - sumA;
+                    }
+
+                    return sumA - sumB;
+                });
+            }
+
+            return result;
         },
     },
 };

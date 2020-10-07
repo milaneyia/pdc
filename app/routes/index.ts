@@ -8,18 +8,18 @@ import { User } from '../models/User';
 const indexRouter = new Router();
 
 indexRouter.get('/api/', async (ctx: ParameterizedContext) => {
-    const contest = await Contest.findForResults();
     const osuId = ctx.session.osuId;
-    let user;
+    let user: User | undefined;
 
     if (osuId) {
         user = await User.findByOsuId(osuId);
     }
 
+    const contest = await Contest.findForResults(user?.isStaff);
+
     ctx.body = {
         contest,
         user,
-        lang: ctx.session.lang,
     };
 });
 

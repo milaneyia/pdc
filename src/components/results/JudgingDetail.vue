@@ -5,10 +5,10 @@
         tabindex="-1"
     >
         <div class="modal-dialog modal-lg">
-            <div v-if="submission" class="modal-content">
+            <div v-if="submission" class="modal-content bg-dark">
                 <div class="modal-header">
                     <h5 class="modal-title">
-                        {{ submission.country.name }}
+                        {{ submission.user.username }}
                     </h5>
                     <button
                         type="button"
@@ -22,7 +22,6 @@
                 <div class="modal-body text-left">
                     <h5>
                         <a
-                            v-if="submission.originalPath"
                             :href="`/api/results/download/${submission.id}`"
                             target="__blank"
                         >

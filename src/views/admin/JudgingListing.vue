@@ -5,43 +5,52 @@
         >
             <p>This shows a listing of all the judging (scores/comments) done by entries</p>
 
-            <select v-model="selectedSongId" class="form-control mt-3">
+            <select class="form-control mt-3" @change="$store.commit('updateSelectedCategoryId', parseInt($event.target.value))">
                 <option
-                    v-for="song in songs"
-                    :key="song.id"
-                    :value="song.id"
+                    v-for="category in contest.categories"
+                    :key="category.id"
+                    :value="category.id"
                 >
-                    {{ song.title }}
+                    {{ category.name }}
                 </option>
             </select>
         </page-header>
 
-        <div v-if="selectedSong" class="card">
+        <div v-if="selectedCategory">
             <judging-leaderboard />
 
-            <data-table
-                v-if="selectedSong.submissions && selectedSong.submissions.length"
-                :headers="['Country', getMatchJudgesCountDisplay(selectedSong.submissions), 'Judges']"
+            <div
+                v-for="song in selectedCategory.songs"
+                :key="song.id"
+                class="card my-2"
             >
-                <tr
-                    v-for="submission in selectedSong.submissions"
-                    :key="submission.id"
-                    data-toggle="modal"
-                    data-target="#detailModalAdmin"
-                    style="cursor: pointer"
-                    @click="selected = submission"
+                <div class="card-header">
+                    <b>{{ song.title }}</b>
+                </div>
+
+                <data-table
+                    :headers="['User', 'Count', 'Judges']"
                 >
-                    <td>
-                        {{ `${submission.user.username} (${submission.anonymisedAs || 'Not anonymized'})` }}
-                    </td>
-                    <td
-                        :class="getJudgesInvolvedCount(submission) >= judgeCount ? 'text-success' : 'text-danger'"
+                    <tr
+                        v-for="submission in song.submissions"
+                        :key="submission.id"
+                        data-toggle="modal"
+                        data-target="#detailModalAdmin"
+                        style="cursor: pointer"
+                        @click="selected = submission"
                     >
-                        {{ getJudgesInvolvedCount(submission) }} done of {{ judgeCount }}
-                    </td>
-                    <td>{{ getJudgesInvolved(submission) }}</td>
-                </tr>
-            </data-table>
+                        <td>
+                            {{ `${submission.user.username} (${submission.anonymisedAs || 'Not anonymized'})` }}
+                        </td>
+                        <td
+                            :class="getJudgesInvolvedCount(submission) >= judgeCount ? 'text-success' : 'text-danger'"
+                        >
+                            {{ getJudgesInvolvedCount(submission) }} done of {{ judgeCount }}
+                        </td>
+                        <td>{{ getJudgesInvolved(submission) }}</td>
+                    </tr>
+                </data-table>
+            </div>
         </div>
 
         <judging-detail
@@ -58,7 +67,8 @@ import PageHeader from '../../components/PageHeader.vue';
 import DataTable from '../../components/admin/DataTable.vue';
 import JudgingDetail from '../../components/results/JudgingDetail.vue';
 import JudgingLeaderboard from '../../components/results/JudgingLeaderboard.vue';
-import { Song, Submission } from '../../interfaces';
+import { Category, Contest, Submission } from '../../interfaces';
+import { Getter, State } from 'vuex-class';
 
 @Component({
     components: {
@@ -70,23 +80,16 @@ import { Song, Submission } from '../../interfaces';
 })
 export default class JudgingListing extends Vue {
 
-    songs: Song[] = [];
+    @State contest!: Contest | null;
+    @State selectedCategoryId!: number;
+    @Getter selectedCategory!: Category;
+
     selected: Submission | null = null;
-    selectedSongId = 1;
-    judgeCount = 5;
+    judgeCount = 7;
 
     async created (): Promise<void> {
-        const [initialData, storeData] = await Promise.all([
-            this.initialRequest<{ songs: [] }>('/api/admin/judging'),
-            this.getRequest('/api/results'),
-        ]);
-
-        if (initialData?.songs) this.songs = initialData.songs;
-        if (storeData) this.$store.commit('updateContest', storeData);
-    }
-
-    get selectedSong (): Song | undefined {
-        return this.songs.find(r => r.id === this.selectedSongId);
+        const data = await this.initialRequest('/api/results');
+        if (data) this.$store.commit('updateContest', data);
     }
 
     getJudgesInvolvedCount (submission: Submission): number {

@@ -9,7 +9,6 @@ import 'reflect-metadata';
 import { createConnection } from 'typeorm';
 import config from '../config.json';
 import indexRouter from './routes';
-import judgingAdminRouter from './routes/admin/judging';
 import submissionsAdminRouter from './routes/admin/submissions';
 import judgingRouter from './routes/judging';
 import resultsRouter from './routes/results';
@@ -90,8 +89,6 @@ app.use(contestsAdminRouter.routes());
 app.use(contestsAdminRouter.allowedMethods());
 app.use(submissionsAdminRouter.routes());
 app.use(submissionsAdminRouter.allowedMethods());
-app.use(judgingAdminRouter.routes());
-app.use(judgingAdminRouter.allowedMethods());
 
 app.use(logsRouter.routes());
 app.use(logsRouter.allowedMethods());

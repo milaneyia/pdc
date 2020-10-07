@@ -33,6 +33,23 @@
             </div>
         </div>
 
+        <div class="row my-3">
+            <div class="col-sm">
+                <div class="btn-group">
+                    <button
+                        v-for="category in contest.categories"
+                        :key="category.id"
+                        type="button"
+                        class="btn btn-dark"
+                        :class="category.id === selectedCategoryId ? 'active' : ''"
+                        @click="$store.commit('updateSelectedCategoryId', category.id)"
+                    >
+                        {{ category.name }}
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <judging-leaderboard />
     </div>
 </template>
@@ -56,9 +73,11 @@ import { Contest } from '../interfaces';
 export default class Results extends Vue {
 
     @State contest!: Contest | null;
+    @State results!: [];
+    @State selectedCategoryId!: number;
 
     async created (): Promise<void> {
-        if (!this.contest) {
+        if (!this.contest || !this.results.length) {
             const data = await this.initialRequest('/api/results');
             if (data) this.$store.commit('updateContest', data);
         }

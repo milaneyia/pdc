@@ -15,6 +15,12 @@ VALUES
 INSERT INTO `contest` (`id`, `votingStartedAt`, `votingEndedAt`, `submissionsStartedAt`, `submissionsEndedAt`, `judgingStartedAt`, `judgingEndedAt`, `resultsAt`)
 VALUES (1, '09/14/2020', '09/22/2020', '09/23/2020', '09/30/2020', '10/01/2020', '11/01/2020', '11/02/2020', '11/20/2020', '11/21/2020');
 
+INSERT INTO `category` (`id`, `name`, `contestId`)
+VALUES
+    (1, 'FA', 1),
+    (2, 'INST', 1),
+    (3, 'VOC', 1);
+
 INSERT INTO `song` (`artist`, `title`, `previewLink`, `isFa`, `contestId`)
 VALUES
     ('AriableyeS',' Gunjou no Messiah','https://osu.ppy.sh/beatmaps/artists/93',1, 1),
