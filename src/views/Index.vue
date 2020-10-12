@@ -73,50 +73,6 @@
                                         />
                                     </div>
                                 </li>
-                                <!-- <li>
-                                    <div>
-                                        {{ $t('index.schedule.announcement') }}
-                                    </div>
-                                    <div>
-                                        <time-string timestamp="09/14/2020" :div="true" />
-                                        <time-string timestamp="09/22/2020" :div="true" />
-                                    </div>
-                                </li>
-                                <li>
-                                    <div>
-                                        {{ $t('index.schedule.voting') }}
-                                    </div>
-                                    <div>
-                                        <time-string timestamp="09/23/2020" :div="true" />
-                                        <time-string timestamp="09/30/2020" :div="true" />
-                                    </div>
-                                </li>
-                                <li>
-                                    <div>
-                                        {{ $t('index.schedule.mapping') }}
-                                    </div>
-                                    <div>
-                                        <time-string timestamp="10/01/2020" :div="true" />
-                                        <time-string timestamp="11/01/2020" :div="true" />
-                                    </div>
-                                </li>
-                                <li>
-                                    <div>
-                                        {{ $t('index.schedule.judging') }}
-                                    </div>
-                                    <div>
-                                        <time-string timestamp="11/02/2020" :div="true" />
-                                        <time-string timestamp="11/20/2020" :div="true" />
-                                    </div>
-                                </li>
-                                <li>
-                                    <div>
-                                        {{ $t('index.schedule.results') }}
-                                    </div>
-                                    <div>
-                                        <time-string timestamp="11/21/2020" :div="true" />
-                                    </div>
-                                </li> -->
                             </ul>
                         </div>
                     </div>
@@ -146,21 +102,14 @@
                             :key="i"
                             class="col-sm-4"
                         >
-                            <div class="card card-body">
+                            <div class="card card-body p-1">
                                 <div class="row text-center">
                                     <div class="col">
-                                        (imagine a badge here)
-                                        <!-- <div
-                                            style="
-                                                background-image: url('/img/badge_1.png');
-                                                background-repeat: no-repeat;
-                                                background-size: contain;
-                                                background-position: center;
-                                                width: 100px;
-                                                height: 50px;
-                                                margin: 0.5rem auto;
-                                            "
-                                        /> -->
+                                        <div
+                                            class="prize-badge rounded"
+                                            :style="`background-image: url('/img/badge_${i}@2x.png');`"
+                                        />
+                                        {{ prizeCategories[i - 1] }}
                                     </div>
                                 </div>
                             </div>
@@ -263,7 +212,13 @@ export default class Index extends Vue {
         { key: 'mapping', timestamps: ['10/01/2020', '11/01/2020'] },
         { key: 'judging', timestamps: ['11/02/2020', '11/20/2020'] },
         { key: 'results', timestamps: ['11/21/2020'] },
-    ]
+    ];
+
+    prizeCategories = [
+        'FA',
+        'INST',
+        'VOCAL',
+    ];
 
 }
 </script>
