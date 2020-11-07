@@ -109,7 +109,6 @@
                                             class="prize-badge rounded"
                                             :style="`background-image: url('/img/badge_${i}@2x.png');`"
                                         />
-                                        {{ prizeCategories[i - 1] }}
                                     </div>
                                 </div>
                             </div>
@@ -207,17 +206,11 @@ export default class Index extends Vue {
     @Getter isSubmissionTime!: boolean;
 
     schedule = [
-        { key: 'announcement', timestamps: ['09/14/2020', '09/22/2020'] },
-        { key: 'voting', timestamps: ['09/23/2020', '09/30/2020'] },
-        { key: 'mapping', timestamps: ['10/01/2020', '11/01/2020'] },
-        { key: 'judging', timestamps: ['11/02/2020', '11/20/2020'] },
-        { key: 'results', timestamps: ['11/21/2020'] },
-    ];
-
-    prizeCategories = [
-        'FA',
-        'INST',
-        'VOCAL',
+        { key: 'announcement', timestamps: ['09/14/2020 GMT-5', '09/22/2020 GMT-5'] },
+        { key: 'voting', timestamps: ['09/23/2020 GMT-5', '09/30/2020 GMT-5'] },
+        { key: 'mapping', timestamps: ['10/01/2020 GMT-5', '11/08/2020 GMT-5'] },
+        { key: 'judging', timestamps: ['11/08/2020 GMT-5', '11/20/2020 GMT-5'] },
+        { key: 'results', timestamps: ['11/21/2020 GMT-5'] },
     ];
 
 }
