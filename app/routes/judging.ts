@@ -1,7 +1,6 @@
 import Router from '@koa/router';
 import { convertToIntOrThrow } from '../helpers';
 import { authenticate, isJudge } from '../middlewares/authentication';
-import { downloadAnonymous, downloadAnonymousZip, findSubmission } from '../middlewares/downloadSubmission';
 import { Judging } from '../models/judging/Judging';
 import { Contest } from '../models/Contest';
 import { Submission } from '../models/Submission';
@@ -139,22 +138,5 @@ judgingRouter.post('/save', async (ctx) => {
         success: 'Saved!',
     };
 });
-
-judgingRouter.get('/downloadZip/:categoryId', async (ctx, next) => {
-    const categoryId = convertToIntOrThrow(ctx.params.categoryId);
-    const category = ctx.state.contest.categories.find(c => c.id === categoryId);
-
-    if (!category) {
-        return ctx.body = {
-            error: 'oops',
-        };
-    }
-
-    ctx.state.category = category;
-
-    return await next();
-}, downloadAnonymousZip);
-
-judgingRouter.get('/submission/:id/download', findSubmission, downloadAnonymous);
 
 export default judgingRouter;

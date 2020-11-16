@@ -241,7 +241,7 @@ export default class JudgingLeaderboard extends Vue {
     }
 
     getFinalScore (standardizedFinalScore: number): string {
-        return isNaN(standardizedFinalScore) ? '0' : standardizedFinalScore.toFixed(4);
+        return isNaN(standardizedFinalScore) || standardizedFinalScore === null ? '0' : standardizedFinalScore.toFixed(4);
     }
 
     sortBy (field: string, relatedId?: number): void {
