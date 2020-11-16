@@ -29,18 +29,6 @@
             >
                 Download original
             </a>
-
-            <button class="btn btn-sm btn-primary mt-2 mx-1" @click="generateAnomZip($event)">
-                Generate zip (from anonymised osz for judges)
-            </button>
-
-            <a
-                :href="`/api/admin/submissions/${selectedCategoryId}/downloadAnomZip`"
-                class="btn btn-sm btn-primary mt-2 mx-1"
-                target="_blank"
-            >
-                Download anom
-            </a>
         </page-header>
 
         <div v-if="selectedCategory">
@@ -59,7 +47,6 @@
                         'Submission Date',
                         'Original Link',
                         'Anonymised As',
-                        'Anonymised Link',
                         '',
                     ]"
                 >
@@ -84,22 +71,6 @@
                             >
 
                             <span v-else>{{ submission.anonymisedAs }}</span>
-                        </td>
-                        <td>
-                            <input
-                                v-if="editing == submission.id"
-                                type="file"
-                                class="form-control form-control-sm"
-                                maxlength="255"
-                                @change="oszFile = $event.target.files[0]"
-                            >
-
-                            <a
-                                v-else-if="submission.anonymisedAs"
-                                :href="`/api/admin/submissions/${submission.id}/downloadAnom`"
-                            >
-                                download
-                            </a>
                         </td>
                         <td>
                             <template v-if="editing == submission.id">
@@ -164,7 +135,6 @@ export default class SubmissionListing extends Vue {
     categories: Song[] = [];
     editing: null | number = null;
     anonymisedAs = '';
-    oszFile: File | null = null;
     isSaving = false;
     selectedCategoryId = 1;
 
@@ -183,8 +153,7 @@ export default class SubmissionListing extends Vue {
 
     async save (submission: Submission, e: Event): Promise<void> {
         this.isSaving = true;
-        const data = await this.fileRequest<{ success: string }>(`/api/admin/submissions/${submission.id}/save`, {
-            oszFile: this.oszFile,
+        const data = await this.postRequest<{ success: string }>(`/api/admin/submissions/${submission.id}/save`, {
             anonymisedAs: this.anonymisedAs,
         }, e);
         this.isSaving = false;
@@ -197,26 +166,16 @@ export default class SubmissionListing extends Vue {
 
     edit (id: number, anonymisedAs: string): void {
         this.editing = id;
-        this.oszFile = null;
         this.anonymisedAs = anonymisedAs || '';
     }
 
     cancel (): void {
         this.editing = null;
-        this.oszFile = null;
         this.anonymisedAs = '';
     }
 
     async generateZip (e: Event): Promise<void> {
-        await this.postRequest(`/api/admin/submissions/${this.selectedCategoryId}/generateZip`, {
-            type: 'original',
-        }, e);
-    }
-
-    async generateAnomZip (e: Event): Promise<void> {
-        await this.postRequest(`/api/admin/submissions/${this.selectedCategoryId}/generateZip`, {
-            type: 'anom',
-        }, e);
+        await this.postRequest(`/api/admin/submissions/${this.selectedCategoryId}/generateZip`, {}, e);
     }
 
 }

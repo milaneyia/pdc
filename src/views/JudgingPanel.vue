@@ -27,13 +27,6 @@
                                         {{ category.name }}
                                     </option>
                                 </select>
-                                <a
-                                    v-if="selectedCategory"
-                                    :href="`/api/judging/downloadZip/${selectedCategory.id}`"
-                                    target="_blank"
-                                >
-                                    Download all entries
-                                </a>
                             </div>
                         </div>
                         <div class="card-body p-0">
@@ -77,13 +70,6 @@
                                 <tbody>
                                     <tr v-for="submission in sortedSubmissions" :key="submission.id">
                                         <td class="text-left">
-                                            <a
-                                                class="mr-1"
-                                                :href="`api/judging/submission/${submission.id}/download`"
-                                                target="_blank"
-                                            >
-                                                <i class="fas fa-file-download" />
-                                            </a>
                                             {{ submission.anonymisedAs }}
                                         </td>
                                         <td v-for="criteria in criterias" :key="criteria.id">
