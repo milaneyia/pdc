@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const jszip_1 = __importDefault(require("jszip"));
 const fs_1 = __importDefault(require("fs"));
 const router_1 = __importDefault(require("@koa/router"));
-const koa_body_1 = __importDefault(require("koa-body"));
 const helpers_1 = require("../../helpers");
 const authentication_1 = require("../../middlewares/authentication");
 const downloadSubmission_1 = require("../../middlewares/downloadSubmission");
@@ -36,23 +35,12 @@ submissionsAdminRouter.get('/', (ctx) => __awaiter(void 0, void 0, void 0, funct
         categories,
     };
 }));
-submissionsAdminRouter.post('/:id/save', koa_body_1.default({
-    multipart: true,
-    formidable: {
-        multiples: false,
-    },
-}), (ctx) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b;
+submissionsAdminRouter.post('/:id/save', (ctx) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     const anonymisedAs = (_a = ctx.request.body.anonymisedAs) === null || _a === void 0 ? void 0 : _a.trim();
     if (!anonymisedAs) {
         return ctx.body = {
             error: `Type the entry's name`,
-        };
-    }
-    const oszFile = (_b = ctx.request.files) === null || _b === void 0 ? void 0 : _b.oszFile;
-    if (!oszFile || !oszFile.name.endsWith('.osz')) {
-        return ctx.body = {
-            error: 'Select an .osz file',
         };
     }
     const submissionId = helpers_1.convertToIntOrThrow(ctx.params.id);
@@ -65,8 +53,6 @@ submissionsAdminRouter.post('/:id/save', koa_body_1.default({
             'user',
         ],
     });
-    const paths = helpers_1.generateAnonymizedPaths(submission.song, submission.user, anonymisedAs);
-    yield helpers_1.saveFile(oszFile.path, paths.finalDir, paths.finalPath);
     submission.anonymisedAs = anonymisedAs;
     yield submission.save();
     ctx.body = {
@@ -74,9 +60,7 @@ submissionsAdminRouter.post('/:id/save', koa_body_1.default({
     };
 }));
 submissionsAdminRouter.get('/:id/download', downloadSubmission_1.findSubmission, downloadSubmission_1.downloadOriginal);
-submissionsAdminRouter.get('/:id/downloadAnom', downloadSubmission_1.findSubmission, downloadSubmission_1.downloadAnonymous);
 submissionsAdminRouter.post('/:categoryId/generateZip', (ctx) => __awaiter(void 0, void 0, void 0, function* () {
-    const anomType = ctx.request.body.type === 'anom';
     const categoryId = helpers_1.convertToIntOrThrow(ctx.params.categoryId);
     const category = yield Category_1.Category.findOneOrFail({
         where: {
@@ -91,26 +75,12 @@ submissionsAdminRouter.post('/:categoryId/generateZip', (ctx) => __awaiter(void 
     const zip = new jszip_1.default();
     for (const song of category.songs) {
         for (const submission of song.submissions) {
-            let paths;
-            if (anomType) {
-                if (!submission.anonymisedAs)
-                    continue;
-                paths = helpers_1.generateAnonymizedPaths(song, submission.user, submission.anonymisedAs);
-            }
-            else {
-                paths = helpers_1.generateOriginalPaths(song, submission.user);
-            }
+            const paths = helpers_1.generateOriginalPaths(song, submission.user);
             yield helpers_1.checkFileExistence(paths.finalPath);
             zip.file(paths.outputFilename, fs_1.default.createReadStream(paths.finalPath));
         }
     }
-    let paths;
-    if (anomType) {
-        paths = helpers_1.generateAnonymizedZipPaths(category);
-    }
-    else {
-        paths = helpers_1.generateOriginalZipPaths(category);
-    }
+    const paths = helpers_1.generateOriginalZipPaths(category);
     yield fs_1.default.promises.mkdir(paths.finalDir, { recursive: true });
     const content = yield zip.generateAsync({ type: 'nodebuffer' });
     yield fs_1.default.promises.writeFile(paths.finalPath, content);
@@ -130,5 +100,4 @@ function findCategory(ctx, next) {
     });
 }
 submissionsAdminRouter.get('/:categoryId/downloadZip', findCategory, downloadSubmission_1.downloadOriginalZip);
-submissionsAdminRouter.get('/:categoryId/downloadAnomZip', findCategory, downloadSubmission_1.downloadAnonymousZip);
 exports.default = submissionsAdminRouter;

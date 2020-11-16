@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const router_1 = __importDefault(require("@koa/router"));
 const helpers_1 = require("../helpers");
 const authentication_1 = require("../middlewares/authentication");
-const downloadSubmission_1 = require("../middlewares/downloadSubmission");
 const Judging_1 = require("../models/judging/Judging");
 const Contest_1 = require("../models/Contest");
 const Submission_1 = require("../models/Submission");
@@ -132,16 +131,4 @@ judgingRouter.post('/save', (ctx) => __awaiter(void 0, void 0, void 0, function*
         success: 'Saved!',
     };
 }));
-judgingRouter.get('/downloadZip/:categoryId', (ctx, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const categoryId = helpers_1.convertToIntOrThrow(ctx.params.categoryId);
-    const category = ctx.state.contest.categories.find(c => c.id === categoryId);
-    if (!category) {
-        return ctx.body = {
-            error: 'oops',
-        };
-    }
-    ctx.state.category = category;
-    return yield next();
-}), downloadSubmission_1.downloadAnonymousZip);
-judgingRouter.get('/submission/:id/download', downloadSubmission_1.findSubmission, downloadSubmission_1.downloadAnonymous);
 exports.default = judgingRouter;
