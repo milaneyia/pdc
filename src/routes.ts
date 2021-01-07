@@ -2,7 +2,6 @@ import { RouteConfig } from 'vue-router';
 import Index from './views/Index.vue';
 const Information = () => import(/* webpackChunkName: "info", webpackPrefetch: true */ './views/Information.vue');
 const Results = () => import(/* webpackChunkName: "info", webpackPrefetch: true */ './views/Results.vue');
-const Voting = () => import(/* webpackChunkName: "user" */ './views/Voting.vue');
 const Submissions = () => import(/* webpackChunkName: "user" */ './views/Submissions.vue');
 const ManageContest = () => import(/* webpackChunkName: "admin" */ './views/admin/ManageContest.vue');
 const SubmissionListing = () => import(/* webpackChunkName: "admin" */ './views/admin/SubmissionListing.vue');
@@ -16,7 +15,6 @@ const routes: RouteConfig[] = [
     { path: '/info', component: Information, meta: { title: 'Information - PDC2020' } },
     { path: '/results', component: Results, meta: { title: 'Results - PDC2020' } },
 
-    { path: '/voting', component: Voting, meta: { title: 'Song Voting - PDC2020' } },
     { path: '/submissions', component: Submissions, meta: { title: 'Submissions - PDC2020' } },
 
     { path: '/admin/contests', component: ManageContest, meta: { title: 'Manage Contest - PDC2020' } },

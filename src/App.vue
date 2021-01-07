@@ -38,12 +38,6 @@
                         </router-link>
                     </li>
 
-                    <li v-if="isVotingTime" class="nav-item">
-                        <router-link class="nav-link small" to="/voting">
-                            {{ $t('nav.voting') }}
-                        </router-link>
-                    </li>
-
                     <li v-if="isSubmissionTime" class="nav-item">
                         <router-link class="nav-link small" to="/submissions">
                             {{ $t('nav.submissions') }}
