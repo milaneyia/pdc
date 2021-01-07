@@ -74,11 +74,11 @@ function generateZipPaths(baseDir: string, category: Category): Paths {
 function generatePaths(baseDir: string, song: Song, user: User, anonymisedAs?: string): Paths {
     const finalDir = path.join(baseDir, song.id.toString());
     let finalPath = path.join(finalDir, user.id.toString());
-    let outputFilename = `${user.username} - ${song.title}.osz`;
+    let outputFilename = `${user.username} - ${song.title}.zip`;
 
     if (anonymisedAs) {
         finalPath = path.join(finalDir, anonymisedAs);
-        outputFilename = `${anonymisedAs}.osz`;
+        outputFilename = `${anonymisedAs}.zip`;
     }
 
     return {

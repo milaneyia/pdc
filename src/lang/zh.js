@@ -45,7 +45,7 @@ export default {
         others: '其他作品',
     },
     submissions: {
-        title: '作品 (.osz) 提交',
+        title: '作品 (.zip) 提交',
         table: {
             song: '曲目',
             date: '提交时间',
@@ -58,7 +58,7 @@ export default {
         },
         input: {
             browse: '浏览',
-            placeholder: '.osz 格式 (最高20Mb)',
+            placeholder: '.zip 格式 (最高20Mb)',
         },
         save: '保存',
     },

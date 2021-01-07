@@ -3,10 +3,7 @@
         <page-header
             title="Submissions"
         >
-            <p>Listing of submissions by song, you NEED to set an anonymised name and upload the .osz for the entry, otherwise it'll not show up for the judges</p>
-            <p class="small">
-                Also generate zips for faster download before judging is started
-            </p>
+            <p>Listing of submissions by song, you NEED to set an anonymised name, otherwise it'll not show up for the judges</p>
 
             <select v-model="selectedCategoryId" class="form-control mt-3">
                 <option

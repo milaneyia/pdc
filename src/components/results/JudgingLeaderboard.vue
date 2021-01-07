@@ -26,16 +26,6 @@
                     >
                         Std detail
                     </a>
-                    <template v-if="contest && new Date() >= new Date(contest.resultsAt)">
-                        |
-                        <a
-
-                            :href="`/api/results/downloadZip/${contest.id}/${selectedCategoryId}`"
-                            target="_blank"
-                        >
-                            Download all entries
-                        </a>
-                    </template>
                 </div>
             </div>
             <div class="row">

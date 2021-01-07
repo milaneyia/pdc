@@ -65,7 +65,7 @@ export default Vue.extend({
         async fileRequest<T>(url: string, data?: { oszFile: File | null; [key: string]: any }, e?: Event | null): Promise<T | undefined> {
             if (!data?.oszFile) {
                 this.$store.commit('addToast', {
-                    message: 'Select an .osz',
+                    message: 'Select an .zip',
                     type: 'danger',
                 });
 

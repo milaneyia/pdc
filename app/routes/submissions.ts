@@ -47,9 +47,9 @@ submissionsRouter.post('/save', authenticate, koaBody({
 
     const oszFile = ctx.request.files?.oszFile;
 
-    if (!oszFile?.name.endsWith('.osz')) {
+    if (!oszFile?.name.endsWith('.zip')) {
         return ctx.body = {
-            error: 'Select an .osz file',
+            error: 'Select an .zip file',
         };
     }
 

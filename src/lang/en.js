@@ -50,7 +50,7 @@ export default {
         },
     },
     submissions: {
-        title: '.osz Submissions',
+        title: '.zip Submissions',
         table: {
             song: 'Song',
             date: 'Submission Date',
@@ -63,7 +63,7 @@ export default {
         },
         input: {
             browse: 'Browse',
-            placeholder: '.osz File (20Mb max)',
+            placeholder: '.zip File (20Mb max)',
         },
         save: 'Save',
     },

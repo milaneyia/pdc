@@ -20,15 +20,6 @@
                 </div>
 
                 <div class="modal-body text-left">
-                    <h5>
-                        <a
-                            :href="`/api/results/download/${submission.id}`"
-                            target="__blank"
-                        >
-                            Download the entry
-                        </a>
-                    </h5>
-
                     <div
                         v-for="(judging, i) in submission.judging"
                         :key="judging.id"
