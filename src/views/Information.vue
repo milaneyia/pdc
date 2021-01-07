@@ -16,7 +16,7 @@
             <div class="text-center">
                 {{ $t('information.intro.moreInfo.go') }}
                 <a
-                    href="https://osu.ppy.sh/community/forums/topics/1155108"
+                    href="https://osu.ppy.sh/community/forums/topics/1203301"
                     target="__blank"
                 >
                     <b>{{ $t('information.intro.moreInfo.here') }}</b>
@@ -31,11 +31,14 @@
                 <b>{{ $t('information.ruleset.note') }}</b>
             </p>
 
-            <ul>
-                <li v-for="(rule, i) in $t('information.ruleset.rules')" :key="i">
-                    {{ rule }}
-                </li>
-            </ul>
+            <div v-for="(ruleset, i) in $t('information.ruleset.rules')" :key="i + 'set'">
+                <p>{{ ruleset.category }}</p>
+                <ul>
+                    <li v-for="(rule, i) in ruleset.rules" :key="i">
+                        {{ rule }}
+                    </li>
+                </ul>
+            </div>
         </card-text>
 
         <card-text
@@ -51,26 +54,15 @@
                 <ul>
                     <li v-for="song in category.songs" :key="song.id">
                         {{ song.artist }} - {{ song.title }}
-                        <a
-                            v-if="song.wasChosen"
-                            class="ml-auto"
-                            :href="`/api/voting/${song.id}/downloadTemplate`"
-                        >
-                            <i class="fas fa-download" />
-                        </a>
                     </li>
                 </ul>
             </p>
         </card-text>
 
         <card-text
-            :header="$t('information.mapping.title')"
+            :header="$t('information.rankingPrizes.title')"
         >
-            <ul>
-                <li v-for="(rule, i) in $t('information.mapping.rules')" :key="i">
-                    {{ rule }}
-                </li>
-            </ul>
+            {{ $t('information.rankingPrizes.description') }}
         </card-text>
 
         <card-text

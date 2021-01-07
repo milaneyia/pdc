@@ -2,7 +2,7 @@
     <div>
         <div class="container pt-6">
             <h1 class="text-center">
-                <b>Pending Cup Mapping Contest</b>
+                <b>Newspaper Cup</b>
             </h1>
 
             <div class="row mt-5">
@@ -18,7 +18,7 @@
                         </a>
                         <a
                             class="d-flex align-items-center mb-3 mb-sm-0"
-                            href="https://osu.ppy.sh/community/forums/topics/1155108"
+                            href="https://osu.ppy.sh/community/forums/topics/1203301"
                             target="__blank"
                         >
                             <div style="background-image: url('/img/osu.png'); height: 30px; width: 30px; background-repeat: no-repeat; background-size: cover;" />
@@ -206,11 +206,10 @@ export default class Index extends Vue {
     @Getter isSubmissionTime!: boolean;
 
     schedule = [
-        { key: 'announcement', timestamps: ['09/14/2020 GMT-5', '09/22/2020 GMT-5'] },
-        { key: 'voting', timestamps: ['09/23/2020 GMT-5', '09/30/2020 GMT-5'] },
-        { key: 'mapping', timestamps: ['10/01/2020 GMT-5', '11/08/2020 GMT-5'] },
-        { key: 'judging', timestamps: ['11/08/2020 GMT-5', '11/20/2020 GMT-5'] },
-        { key: 'results', timestamps: ['11/21/2020 GMT-5'] },
+        { key: 'announcement', timestamps: ['12/10/2020 GMT-5'] },
+        { key: 'mapping', timestamps: ['12/17/2020 GMT-5', '01/18/2021 GMT-5'] },
+        { key: 'judging', timestamps: ['01/24/2021 GMT-5', '02/21/2021 GMT-5'] },
+        { key: 'results', timestamps: ['02/27/2021 GMT-5'] },
     ];
 
 }

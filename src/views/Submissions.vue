@@ -50,15 +50,6 @@
                             {{ $t('submissions.deadline.submit') }}
                         </div>
                         <div class="card-body">
-                            <div class="text-center mb-2">
-                                <a
-                                    v-if="selectedSongId"
-                                    :href="`/api/voting/${selectedSongId}/downloadTemplate`"
-                                >
-                                    Download the template
-                                </a>
-                            </div>
-
                             <select v-model="selectedSongId" class="form-control mb-2">
                                 <option
                                     v-for="song in contest.songs"

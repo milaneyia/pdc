@@ -35,7 +35,7 @@ const router = new VueRouter({
 const locale = localStorage.lang || 'en';
 
 router.beforeEach(async (to, from, next) => {
-    document.title = to.meta.title || 'Pending Cup Mapping Contest';
+    document.title = to.meta.title || 'Newspaper Cup';
 
     if (!store.state.initialized) {
         const res = await Axios.get('/api/');

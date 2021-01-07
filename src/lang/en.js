@@ -69,8 +69,8 @@ export default {
     },
     information: {
         intro: {
-            hello: 'Hello! It is the time to celebrate again the great annual mapping contest – Pending Cup!',
-            history: 'Pending Cup is originally a Chinese mapping contest, which had its first iteration in 2013 and held by NatsumeRin. Through the past years, Pending Cup has always been a means of encouraging creative mapping and finding new talent across the entire mapping community, and it will always be the core value of the contest. We would strongly encourage and welcome you to participate this event!',
+            hello: 'Hello! It is the time to celebrate again the great annual mapping contest – Newspaper Cup!',
+            history: 'NPC is now a generic mapping contest that allows every valid user in osu! to participate and win prizes like badge or supporter tags! (just like PDC)',
             moreInfo: {
                 go: 'For more detailed information go to the forum post',
                 here: 'here',
@@ -80,31 +80,60 @@ export default {
             title: 'Ruleset',
             note: 'Please read the rules carefully. Participants who violate the rules will be in risk of losing points or, under certain circumstances, have themselves disqualified from this contest.',
             rules: [
-                'Submission deadline is enforced.',
-                'Submission must be complete, i.e, loadable and readable by osu! client.',
-                'Custom hitsounds are allowed.',
-                'Title, Artist, MP3, Source, Tags must NOT be modified. However, preview point can be customized.',
-                'No background, video, skin and storyboard (including storyboard hitsounds) are allowed. However, custom combo colors are allowed.',
-                'Submission must be finished by the contestant only. No collaboration is allowed.',
-                'You cannot provide submission to any other individuals or parties before results are administered to the contestants and announced. Your submission should not contain information that helps Judges to recognize you.',
-                'No registration is required to enter the contest. Please directly submit through the website.',
-                'No smurfing account / multiaccount is allowed.',
-                'Ranking criteria should be obeyed except for apparently not applicable cases such as spread requirements.',
-                'Submitting entries means understanding and agreeing the ruleset above.',
-                'All rights reserved to the PDC2020 Committee.',
+                {
+                    category: 'Beatmapping (Very important! Please check your map before submitting.)',
+                    rules: [
+                        'Following sections in .osu file provided in the template must be left unchanged: AudioFilename, AudioLeadIn, Mode, LetterboxInBreaks, WidescreenStoryboard, Title, TitleUnicode, Artist, ArtistUnicode, Source, Tags, BeatmapID, BeatmapSetID AND The entire [Events] section except for breaks.',
+                        'You CAN modify timing based on your own discretion.',
+                        'Ranking Criteria is enforced except for inapplicable items such as spread requirements, etc.',
+                        'Your map must be loadable and readable by osu! client.',
+                        'You must complete the map on your own effort.',
+                        'Your map should not be revealed to anyone other than yourself before the announcement of the contest results. This includes what track or song you are mapping. Your map should not contain information that can help with identifying you.',
+                        'Judges cannot participate in the contest.',
+                        'Submitting entries means understanding and agreeing the ruleset above.',
+                        'All rights reserved to the NPC 2021 Committee.',
+                    ],
+                },
+                {
+                    category: 'Submission',
+                    rules: [
+                        'Only submissions through this website',
+                    ],
+                },
+                {
+                    category: 'Judging',
+                    rules: [
+                        'Each judge will score the submissions independently. Judges will not know the creator of the submissions.',
+                        'The unit of scoring is 1%. The categories of Judging are listed below (Expertise, Cohesion, Creativity, Judge’s Impression)',
+                        'The score will be standardized per the following method: The final score S* of a submission in the Qualifier Round is obtained by: S* = ( S - S(average) ) / SD, in which S is the Original Score, S(average) is the average of all Original Scores that a judge has given throughout the round and SD is the standard deviation of all Original Scores that a judge has given throughout the round.',
+                        'For each song group, participants will be sorted in a descending order according to their Actual Score',
+                    ],
+                },
+                {
+                    category: 'Definition of Novice Mapper (You must satisfy ALL the items listed to be considered as a novice mapper)',
+                    rules: [
+                        'Smurf Prevention:',
+                        'i. Your account is created before 2020.9.10;',
+                        'ii. You have submitted at least one mapset to osu!BSS before 2020.11.10;',
+                        'iii. You have at least 30 kudosus OR 2,000 play counts OR 500,000 TTH.',
+                        'Mapping and Modding Experience:',
+                        'i. You have, at most, 1 ranked / qualified difficulties of Insane or higher (according to osu! Website icon), this includes your mapset, guest or collab difficulties before 2020.12.10;',
+                        'ii. You have less than 6 ranked / qualified difficulties in total, this includes your mapset, guest or collab difficulties before 2020.12.10;',
+                        'iii. You have less than 500 kudosus. You are not, or have never been a member of mapping and modding-related osu! teams (BAT, MAT, BN, QAT, NAT, etc.);',
+                        'iv. You have never been ranked within first three places of mapping contests (PDC, NPC, MBC, Aspire, Mapping Olympics, o!bwc, etc.);',
+                        'v. You pass our case-by-case check of eligibility of being a novice mapper.',
+                        'Don’t be sad if you are not eligible to be novice. You can still participate and win badges and prizes as a regular mapper!',
+                    ],
+                },
             ],
         },
         songs: {
             title: 'Songs',
-            description: 'The contest introduces three groups of songs. Participants are able to compete in all groups, but may only chose ONE song from each group to attend the contest.',
+            description: 'You can participate in both tracks but you can only select one song inside one track. Download template at: https://drive.google.com/file/d/1kaQsevs3YV72AsieThjsmKh19N-DJGQn or at https://pan.baidu.com/s/1lDfx8siRCObFUpGGK-A8yw 提取码：npc2 (Thanks pw384!).',
         },
-        mapping: {
-            title: 'Mapping',
-            rules: [
-                'Participants have to change the Beatmap Creator in song setup to your OSU! ID, such as "Mafumafu."',
-                'One and only one difficulty is allowed. If multiple difficulties are submitted, only the one with the highest star difficulty will be accepted.',
-                'Only the following difficulty names are allowed: Easy/Normal/Hard/Insane/Expert/Extra',
-            ],
+        rankingPrizes: {
+            title: 'Ranking and Prizes',
+            description: 'The NPC 2021 uses a new ranking system. Ranking will be split into two tracks: Instrumental Group and Vocal Track. The 1st place of each track and the highest-ranked novice mapper of each track will be awarded a badge (to apply). The novice must ranked <15 AND <40% of participants in each track to receive the prize. (This is to ensure the quality of maps we award to.)',
         },
         criterias: {
             title: 'Criterias',
